@@ -1,0 +1,60 @@
+{namespace search.helpers}
+
+/**
+ * @param prettyQuery
+ * @param browseDirectory
+ * @param? resultTypePlural
+ */
+{template .noResults}
+
+  // When ace locator returns no results for a query, it will call search.helpers.noResults
+  // If the query was empty, then $prettyQuery == ''
+  // You can edit this template if you would like to change the behavior.
+  {call cobalt.locator.noResults data="all" /}
+
+{/template}
+
+/**
+ * @param? queryParams
+ * @param? response
+ */
+{template .pretty_city_state_query}
+  {let $city: $response?.geo?.address?.city /}
+  {let $region: $response?.geo?.address?.region /}
+  {let $country: $response?.geo?.address?.country /}
+  {let $prettyQuery: $queryParams?.qp?[0] /}
+  {let $query: $queryParams?.q?[0] /}
+
+  {if $city}
+    {$city |escapeHtml}
+    {if $region}
+      , {$region |escapeHtml}
+    {/if}
+  {elseif $region}
+    {$region |escapeHtml}
+  {elseif $country}
+    {$country |escapeHtml}
+  {elseif $prettyQuery}
+    {$prettyQuery |escapeHtml}
+  {elseif $query}
+    {$query |escapeHtml}
+  {/if}
+{/template}
+
+/**
+ * @param? queryParams
+ * @param? response
+ */
+{template .pretty_zip_query}
+  {let $postalCode: $response?.geo?.address?.postalCode /}
+  {let $prettyQuery: $queryParams?.qp?[0] /}
+  {let $query: $queryParams?.q?[0] /}
+
+  {if $postalCode}
+    {$postalCode |escapeHtml}
+  {elseif $prettyQuery}
+    {$prettyQuery |escapeHtml}
+  {elseif $query}
+    {$query |escapeHtml}
+  {/if}
+{/template}

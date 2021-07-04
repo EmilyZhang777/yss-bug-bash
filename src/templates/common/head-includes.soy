@@ -1,0 +1,66 @@
+{namespace common}
+
+/**
+ * @param crumbNames
+ * @param locale
+ * @param logo
+ * @param title
+ * @param? description
+ * @param? keywords
+ * @param? includeAlternateLinks
+ * @param siteDomain
+ * @param isHttps
+ * @param versions
+ */
+{template .head_tags}
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  {call common.include.dns_prefetch /}
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta name="format-detection" content="telephone=no">
+  {let $metaDescription}
+    {if $description}
+      {$description |noAutoescape}
+    {else}
+      {if length($crumbNames) > 1} in{sp}
+        {foreach $crumb in $crumbNames}
+          {$crumbNames[(length($crumbNames) - 1) - index($crumb)]}
+          {if index($crumb) < length($crumbNames) - 2}, {/if}
+        {/foreach}.
+      {/if}
+    {/if}
+  {/let}
+  <meta name="description" content="{$metaDescription |noAutoescape}">
+  <meta name="keywords" content="{if $keywords}{$keywords |noAutoescape}{/if}">
+
+  <meta property="og:title" content="{$title |noAutoescape}">
+  <meta property="og:description" content="{$metaDescription |noAutoescape}">
+
+  {let $ogImage}
+    {if not strContains($logo, '//')}
+      {call components.Util.Absolutize data="all"}
+        {param path: replace($logo, '../', '') /}
+      {/call}
+    {else}
+      {call components.Util.Protocolize data="all" }
+        {param url: $logo /}
+      {/call}
+    {/if}
+  {/let}
+
+  // TODO: Ensure og:image reflects logo
+  <meta property="og:image" content="{$ogImage}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{call common.helpers.canonical_link_url data="all" /}">
+  <meta name="twitter:card" content="summary">
+
+  {call common.helpers.canonical_link data="all" /}
+
+  {if $includeAlternateLinks}
+    {call common.helpers.alternate_links data="all" /}
+  {/if}
+
+  <title>
+    {$title |noAutoescape}
+  </title>
+{/template}

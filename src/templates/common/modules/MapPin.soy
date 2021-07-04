@@ -1,0 +1,87 @@
+{namespace common.modules}
+
+/**
+ * This template should print a valid value for an image src.
+ * @param? backgroundColor
+ * @param? index
+ * @param? profile
+ * @param? textColor
+ */
+{template .Pin_default}
+  {if $profile}
+    // You can use profile to customize the pin icon for an entity.
+  {/if}
+
+  {let $svgPin}
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="26" viewBox="0 0 22 26">
+      <g fill="none" fill-rule="evenodd">
+        <path fill="{$backgroundColor ?: 'red'}" fill-rule="nonzero" stroke="{$textColor ?: 'white'}" d="M0 10.767c0 5.563 7.196 12.418 9.947 14.836.6.527 1.509.53 2.112.005C14.815 23.212 22 16.423 22 10.767 22 4.82 17.075 0 11 0S0 4.82 0 10.767"/>
+        {if isNonnull($index)}
+          <text fill="{$textColor ?: 'white'}" font-family="Arial-BoldMT,Arial" font-size="12" font-weight="bold">
+            <tspan x="50%" y="15" text-anchor="middle">{$index}</tspan>
+          </text>
+        {/if}
+      </g>
+    </svg>
+  {/let}
+
+  data:image/svg+xml;base64,{$svgPin |encodeBase64}
+{/template}
+
+/**
+ * @param? backgroundColor
+ * @param? index
+ * @param? profile
+ * @param? textColor
+ */
+{template .Pin_hovered}
+  {call .Pin_default data="all"}
+    {param backgroundColor: $backgroundColor ?: 'green' /}
+  {/call}
+{/template}
+
+/**
+ * @param? backgroundColor
+ * @param? index
+ * @param? profile
+ * @param? textColor
+ */
+{template .Pin_selected}
+  {call .Pin_default data="all"}
+    {param backgroundColor: $backgroundColor ?: 'blue' /}
+  {/call}
+{/template}
+
+/**
+ * This template should print a valid value for an image src.
+ * @param? backgroundColor
+ * @param? pinCount
+ * @param? textColor
+ */
+{template .Pin_cluster}
+  {let $svgPin}
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+      <g fill="none" fill-rule="evenodd">
+        <circle fill="{$backgroundColor ?: 'red'}" fill-rule="nonzero" stroke="{$textColor ?: 'white'}" cx="11" cy="11" r="11"/>
+        {if isNonnull($pinCount)}
+          <text fill="{$textColor ?: 'white'}" font-family="Arial-BoldMT,Arial" font-size="12" font-weight="bold">
+            <tspan x="50%" y="15" text-anchor="middle">{$pinCount}</tspan>
+          </text>
+        {/if}
+      </g>
+    </svg>
+  {/let}
+
+  data:image/svg+xml;base64,{$svgPin |encodeBase64}
+{/template}
+
+/**
+ * @param? backgroundColor
+ * @param? pinCount
+ * @param? textColor
+ */
+{template .Pin_clusterHovered}
+  {call .Pin_cluster data="all"}
+    {param backgroundColor: $backgroundColor ?: 'green' /}
+  {/call}
+{/template}

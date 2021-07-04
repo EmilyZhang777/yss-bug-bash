@@ -1,0 +1,15 @@
+/** @define Breadcrumbs */
+
+.Breadcrumbs
+{
+  &--ace .c-bread-crumbs-item
+  {
+    display: inline-block;
+
+    &:not(:last-child)::after
+    {
+      content: url('assets/images/angle.svg'); // GENERATOR TODO: this should be a param
+      vertical-align: -6px;
+    }
+  }
+}

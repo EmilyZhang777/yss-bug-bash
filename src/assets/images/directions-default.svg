@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 63.1 (101010) - https://sketch.com -->
+    <title>6F4D4D5B-6DEF-44E5-B9E9-6F8AAA66F95C@1.00x</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <path d="M23.6489122,11.1537884 L12.8462116,0.351087772 C12.3780945,-0.117029257 11.6219055,-0.117029257 11.1537884,0.351087772 L0.351087772,11.1537884 C-0.117029257,11.6219055 -0.117029257,12.3780945 0.351087772,12.8462116 L11.1537884,23.6489122 C11.6219055,24.1170293 12.3780945,24.1170293 12.8462116,23.6489122 L23.6489122,12.8462116 C24.1170293,12.3900975 24.1170293,11.6339085 23.6489122,11.1537884 Z M14.3945986,15.0067517 L14.3945986,12.0060015 L9.59339835,12.0060015 L9.59339835,15.6069017 L7.1927982,15.6069017 L7.1927982,10.8057014 C7.1927982,10.1455364 7.73293323,9.60540135 8.39309827,9.60540135 L14.3945986,9.60540135 L14.3945986,6.60465116 L18.5956489,10.8057014 L14.3945986,15.0067517 Z" id="path-1"></path>
+    </defs>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="*Guides/Styles" transform="translate(-620.000000, -373.000000)">
+            <g id="Elements/Icons/Default/Directions" transform="translate(620.000000, 373.000000)">
+                <g id="Container" stroke-width="1" fill-rule="evenodd">
+                    <rect id="Padding" x="0" y="0" width="24" height="24"></rect>
+                </g>
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <use id="Directions" fill="#0F70F0" fill-rule="evenodd" xlink:href="#path-1"></use>
+            </g>
+        </g>
+    </g>
+</svg>

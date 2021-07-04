@@ -1,0 +1,167 @@
+{namespace cobalt.product}
+
+// ---
+// product.ace_default is a specific configuration of product.ace_adapter
+//  which assumes the object being passed in is a standard Product CFT
+//  and does the mappings automatically
+// ---
+
+/**
+ * @param product   // Expects a standard Product CFT
+ *
+ * Configuration params
+ * @param? includePrice
+ * @param? schemaType
+ *
+ * Cobalt Params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ * @param? hideSchema
+ */
+{template .ace_default}
+  {call .ace_adapter data="all"}
+    {param productObject: $product /}
+    {param titleKey: 'title' /}
+    {param descriptionKey: 'description' /}
+    {param imageKey: 'image' /}
+    {param ctaKey: 'cta' /}
+    {param priceKey: 'price' /}
+  {/call}
+{/template}
+
+// ---
+// product.ace_adapter allows the user to map an arbitrary object to a Product
+//  template by defining which object fields map to each part of the Product.
+//
+// product.ace_adapter takes params [...]Key and [...]String for title,
+//  description, image, cta, and price. If [...]Key is truthy, it will attempt
+//  to access that field on $productObject. Else, it will use [...]String
+//  for that value. If [...]String == '', product.ace will not render elements
+//  controlled by that param under any circumstances. Note that passing a
+//  falsey value to product.ace will cause it to not render elements
+//  controlled by that param.
+// ---
+
+/**
+ * @param productObject
+ * @param titleKey
+ * @param descriptionKey
+ * @param imageKey
+ * @param ctaKey
+ * @param priceKey
+
+ * @param? titleString
+ * @param? descriptionString
+ * @param? imageUrlString
+ * @param? imageAltString
+ * @param? ctaTextKey
+ * @param? ctaTextString
+ * @param? ctaUrlKey
+ * @param? ctaUrlString
+ * @param? priceString
+ *
+ * -- Passthrough --
+ * Configuration params
+ * @param? includePrice
+ * @param? schemaType
+ *
+ * Cobalt Params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ * @param? hideSchema
+ */
+{template .ace_adapter}
+  {let $title: $titleString == '' ? false :
+    ($titleKey ? $productObject[$titleKey] : $titleString) /}
+  {let $description: $descriptionString == '' ? false :
+    ($descriptionKey ? $productObject[$descriptionKey]: $descriptionString) /}
+  {let $image: $imageKey ? $productObject[$imageKey] : false /}
+  {let $imageUrl: $imageUrlString == '' ? false :
+    ($image ? imageBySizeEntity($image.image, '500x') : $imageUrlString) /}
+  {let $imageAlt: $image ? $image.image?.alternateText : $imageAltString /}
+  {let $cta: $ctaKey ? $productObject[$ctaKey] : false /}
+  {let $ctaText: $ctaTextString == '' ? false :
+    ($cta ? ($ctaTextKey != '' ? $cta[$ctaTextKey] : $cta.text) : $ctaTextString) /}
+  {let $ctaUrl: $ctaUrlString == '' ? false :
+    ($cta ? ($ctaUrlKey != '' ? $cta[$ctaUrlKey] : $cta.url) : $ctaUrlString) /}
+  {let $price: $priceString == '' ? false :
+    ($priceKey ? $productObject[$priceKey] : $priceString) /}
+
+  {call .ace data="all"}
+    {param title: $title /}
+    {param description: $description /}
+    {param imageUrl: $imageUrl /}
+    {param alternateText: $imageAlt /}
+    {param ctaText: $ctaText /}
+    {param ctaUrl: $ctaUrl /}
+    {param price: $price /}
+  {/call}
+{/template}
+
+/**
+ * Content params
+ * @param title           // pass falsey value to not render
+ * @param description     // pass falsey value to not render
+ * @param imageUrl        // pass falsey value to not render
+ * @param alternateText   // falsey value defaults to "Product Image"
+ * @param ctaText         // cta Text and Url must be truthy to render
+ * @param ctaUrl          //  ^
+ * @param price           // pass falsey value to not render
+ *
+ * Configuration params
+ * @param? includePrice
+ * @param? schemaType
+ *
+ * Cobalt Params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ * @param? hideSchema
+ */
+{template .ace}
+
+  <{$htmlTag ?: 'div'} class="Product Product--ace{if $modifier} {$modifier}{/if}"{if $schemaType and not $hideSchema} itemprop="itemOffered" itemscope itemtype="http://schema.org/{$schemaType}"{/if}>
+    <div class="Product-row">
+      {if $imageUrl}
+        <div class="Product-imgWrapper">
+          <img src="{$imageUrl}"
+               class="Product-img"
+               alt="{$alternateText ? $alternateText : 'Product Image'}"
+               {if not $hideSchema} itemprop="image"{/if}>
+        </div>
+      {/if}
+      <div class="Product-info">
+        {if $title}
+          <h{$hLevel ? $hLevel : '2'} class="Product-title"{if not $hideSchema} itemprop="name"{/if}>
+            {$title |noAutoescape}
+          </h{$hLevel ? $hLevel : '2'}>
+        {/if}
+        {if $description}
+          <div class="Product-text"{if not $hideSchema} itemprop="description"{/if}>
+            {$description |noAutoescape}
+          </div>
+        {/if}
+        {if $includePrice and $price}
+          <div class="Product-cost">
+            {$price}
+          </div>
+        {/if}
+        {if $ctaUrl and $ctaText}
+          <div class="Product-linkWrapper">
+            <a class="Product-link"
+               href="{$ctaUrl}"
+               data-ya-track="{$yaTrackName ?: 'product#'}"
+               {if not $hideSchema} itemprop="url"{/if}>
+              {$ctaText |noAutoescape}
+            </a>
+          </div>
+        {/if}
+      </div>
+    </div>
+  </{$htmlTag ?: 'div'}>
+{/template}

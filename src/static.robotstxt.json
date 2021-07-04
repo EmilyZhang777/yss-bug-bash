@@ -1,0 +1,18 @@
+{
+  "baseUrl": "",
+  "businessId": 919871,
+  "featureId": "Robots.txt",
+  "isHttps": true,
+  "isStaging": true,
+  "locale": "en",
+  "siteAttributes": {},
+  "siteDomain": "emily-demo",
+  "siteId": 529,
+  "siteInternalHostName": "emily-demo",
+  "soyTemplateName": "static.robotstxt.json",
+  "staticPageId": "Robots.txt",
+  "versions": {
+    "en": "robots.txt",
+    "es": "es/robots.txt"
+  }
+}

@@ -1,0 +1,155 @@
+{namespace search}
+
+/**
+ * @param locale
+ * @param queryParams
+ * @param? customParams
+ * @param? schema
+ * @param? hideLegendTitle
+ * @param? order Array specifying the order, should be the QueryParam names
+ * @param? paramNameToTitle
+ */
+{template .Filters}
+  <div class="Filters" data-ya-scope="filters">
+    {let $customFieldKeys: keys($schema) /}
+    {foreach $option in $order ?: [1]} // If no order, do one loop
+      {foreach $filter in $customParams}
+        {if not $order or $option == $filter.param}
+          {foreach $customField in $customFieldKeys}
+            {if $filter.name == $schema[$customField].name}
+              {call .Filter_fieldset data="$schema[$customField]"}
+                {param locale: $locale /}
+                {param paramName: $filter.param /}
+                {param queryParams: $queryParams /}
+                {param paramNameToTitle: $paramNameToTitle /}
+                {param hideLegendTitle: $hideLegendTitle /}
+                {param optionType: $filter.optionType /}
+              {/call}
+            {/if}
+          {/foreach}
+        {/if}
+      {/foreach}
+    {/foreach}
+  </div>
+{/template}
+
+/**
+ * @param locale
+ * @param name Custom Field Name
+ * @param paramName Query Param used
+ * @param queryParams Passthrough
+ * @param type Object containing the type and the options if multi-option select
+ * @param? hideLegendTitle Use legend for WCAG, but do not display text
+ * @param? optionType MULTI_OPTION, SINGLE_OPTION, SINGLE_OPTION_SELECT, BOOLEAN
+ * @param? paramNameToTitle Map query param name to title - ['s': 'Services']
+ */
+{template .Filter_fieldset}
+  {let $legendTitle}
+    {if $paramNameToTitle}
+      {$paramNameToTitle[$paramName] |noAutoescape}
+    {else}
+      {$paramName |title}
+    {/if}
+  {/let}
+  <fieldset class="Filters-{$paramName}">
+    <legend class="Filters-legend{if $hideLegendTitle} sr-only{/if}">
+      {$legendTitle |noAutoescape}
+    </legend>
+    {call .Filter data="all"}
+      {param choices: $type?.optionType?.option /}
+      {param type: $optionType /}
+    {/call}
+  </fieldset>
+{/template}
+
+/**
+ * To use filters, add '"filterTemplate": "search.filters_config",' to entitySearch object in config
+ * @param queryParams
+ */
+{template .filters_config}
+  {let $keys: keys($queryParams) /}
+  {if length($keys)}
+    {lb}
+      "$and":[
+        {call .or_filter data="all"}
+          {param paramName: 'country' /}
+          {param field: 'address.countryCode' /}
+          {param matcher: '$contains' /}
+        {/call}
+        {call .or_filter data="all"}
+          {param paramName: 'postalCode' /}
+          {param field: 'address.postalCode' /}
+          {param matcher: '$contains' /}
+        {/call}
+        {call .or_filter data="all"}
+          {param paramName: 'region' /}
+          {param field: 'isoRegionCode' /}
+          {param matcher: '$contains' /}
+        {/call}
+        // Add filter params here
+        // i.e.:
+        // {call .eqAny_filter data="all"}
+        //   {param paramName: 'store' /}
+        //   {param field: 'c_storeType' /}
+        // {/call}
+        // {call .or_filter data="all"}
+        //   {param paramName: 'name' /}
+        //   {param field: 'name' /}
+        //   {param matcher: '$contains' /}
+        // {/call}
+        {lb}{rb}
+      ]
+    {rb}
+  {else}
+    {lb}{rb}
+  {/if}
+{/template}
+
+/**
+ * @param paramName
+ * @param field
+ * @param queryParams
+ * @param? matcher
+ */
+{template .and_filter}
+  {if contains(keys($queryParams), $paramName)}
+    {lb}
+      "$and":[
+        {foreach $value in $queryParams[$paramName]}
+          {lb}"{$field}": {lb}"{$matcher ?: '$eq'}": "{$value |noAutoescape}"{rb}{rb}{if not isLast($value)},{/if}
+        {/foreach}
+      ]
+    {rb},
+  {/if}
+{/template}
+
+/**
+ * @param paramName
+ * @param field
+ * @param queryParams
+ * @param? matcher
+ */
+{template .or_filter}
+  {if contains(keys($queryParams), $paramName)}
+    {lb}
+      "$or":[
+        {foreach $value in $queryParams[$paramName]}
+          {lb}"{$field}": {lb}"{$matcher ?: '$eq'}": "{$value |noAutoescape}"{rb}{rb}{if not isLast($value)},{/if}
+        {/foreach}
+      ]
+    {rb},
+  {/if}
+{/template}
+
+/**
+ * @param paramName
+ * @param field
+ * @param queryParams
+ */
+{template .eqAny_filter}
+  {if length($queryParams[$paramName] ?: [])}
+    {lb}
+      "{$field}": {lb}"$eqAny": [{foreach $value in $queryParams[$paramName]}"{$value |noAutoescape}"{if not isLast($value)},{/if}{/foreach}]{rb}
+    {rb},
+  {/if}
+{/template}

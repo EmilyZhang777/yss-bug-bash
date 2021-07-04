@@ -1,0 +1,83 @@
+{namespace search}
+
+/**
+ * This template calls cobalt.locator.ace by default, but you may
+ * implement your custom locator here if the design calls for it.
+ *
+ * @param baseUrl
+ * @param businessId
+ * @param isHttps
+ * @param isStaging
+ * @param locale
+ * @param searchId
+ * @param siteAttributes
+ * @param siteDomain
+ * @param siteId
+ * @param siteInternalHostName
+ * @param versions
+ *
+ * Locator params
+ * @param response
+ *
+ * Filters params
+ * @param schema
+ * @param customParams
+ */
+{template .layout}
+
+  {let $rootPath}
+    {$baseUrl}{call url.directoryStateList data="all" /}
+  {/let}
+
+  {let $locatorPath}
+    {$baseUrl}{call url.search data="all" /}
+  {/let}
+
+  {let $rootCrumbName}
+    {call strings.breadcrumbs_crumbBaseName /}
+  {/let}
+
+  {let $locatorCrumbName}
+    {call strings.breadcrumbs_locatorCrumbName /}
+  {/let}
+
+  {let $baseCrumbsNames: [$rootCrumbName, $locatorCrumbName] /}
+  {let $baseCrumbs: [$rootPath, $locatorPath] /}
+
+  {call common.layout data="all"}
+    {param pageTitle}
+      {call strings.locator_metaTitle /} // TODO: Update the page title
+    {/param}
+    {param metaDescription}
+      {call strings.locator_metaDescription /} // TODO: Update the meta description
+    {/param}
+    {param metaKeywords}
+      {call common.helpers.keywords /}
+    {/param}
+
+    {param headInclude}
+      {call common.include.search_assets data="all" /}
+    {/param}
+
+    {param crumbNames: $baseCrumbsNames /}
+    {param crumbUrls: $baseCrumbs /}
+
+    {param hideBreadcrumbs: true /}
+    {param showBackToTop: length($response?.entities ?: []) > 0 /}
+
+    {param pageContent}
+      {call cobalt.locator.ace data="all" /}
+    {/param}
+
+    {param pageLevel: 'locator' /}
+
+    {param analytics}
+      {call components.YextAnalytics.Search data="all" /}
+      {call components.GoogleAnalytics.Geo_locator data="all"}
+        {param analyticsMap: $siteAttributes?.google_analytics ?: [:] /}
+      {/call}
+    {/param}
+
+  {/call}
+
+{/template}

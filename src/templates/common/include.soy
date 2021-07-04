@@ -1,0 +1,173 @@
+{namespace common.include}
+
+{template .dns_prefetch}
+  <link rel="dns-prefetch" href="//www.yext-pixel.com">
+  <link rel="dns-prefetch" href="//a.cdnmktg.com">
+  <link rel="dns-prefetch" href="//a.mktgcdn.com">
+  <link rel="dns-prefetch" href="//dynl.mktgcdn.com">
+  <link rel="dns-prefetch" href="//dynm.mktgcdn.com">
+  <link rel="dns-prefetch" href="//www.google-analytics.com">
+{/template}
+
+
+/**
+  * assets
+  * @param baseUrl
+  * @param locale
+  * @param siteInternalHostName
+  */
+{template .locationEntity_assets}
+  // FYI: This switch is necessary because webpack's replace-hash functionality
+  // needs to find the output file name in this file in order to add the hash to
+  // the end when we go to prod.  We could write our own hash replacer to simplify
+  // this in the future.
+  {switch $siteInternalHostName}
+    {default}
+      <link rel="stylesheet" type="text/css" href="{$baseUrl}primary/locationEntity/styles.css" data-webpack-inline-force>
+      {switch $locale}
+        {case 'en'}
+          <script src="{$baseUrl}primary/locationEntity/en.js" async defer data-webpack-inline></script>
+        {default}
+          <script src="{$baseUrl}primary/locationEntity/en.js" async defer data-webpack-inline></script>
+      {/switch}
+  {/switch}
+{/template}
+
+/**
+  * assets
+  * @param baseUrl
+  * @param locale
+  * @param siteInternalHostName
+  */
+{template .stateList_assets}
+  // FYI: This switch is necessary because webpack's replace-hash functionality
+  // needs to find the output file name in this file in order to add the hash to
+  // the end when we go to prod.  We could write our own hash replacer to simplify
+  // this in the future.
+  {switch $siteInternalHostName}
+    {default}
+      <link rel="stylesheet" type="text/css" href="{$baseUrl}primary/stateList/styles.css" data-webpack-inline-force>
+      {switch $locale}
+        {case 'en'}
+          <script src="{$baseUrl}primary/stateList/en.js" async defer data-webpack-inline></script>
+        {default}
+          <script src="{$baseUrl}primary/stateList/en.js" async defer data-webpack-inline></script>
+      {/switch}
+  {/switch}
+{/template}
+
+/**
+  * assets
+  * @param baseUrl
+  * @param locale
+  * @param siteInternalHostName
+  */
+{template .cityList_assets}
+  // FYI: This switch is necessary because webpack's replace-hash functionality
+  // needs to find the output file name in this file in order to add the hash to
+  // the end when we go to prod.  We could write our own hash replacer to simplify
+  // this in the future.
+  {switch $siteInternalHostName}
+    {default}
+      <link rel="stylesheet" type="text/css" href="{$baseUrl}primary/cityList/styles.css" data-webpack-inline-force>
+      {switch $locale}
+        {case 'en'}
+          <script src="{$baseUrl}primary/cityList/en.js" async defer data-webpack-inline></script>
+        {default}
+          <script src="{$baseUrl}primary/cityList/en.js" async defer data-webpack-inline></script>
+      {/switch}
+  {/switch}
+{/template}
+
+/**
+  * assets
+  * @param baseUrl
+  * @param locale
+  * @param siteInternalHostName
+  */
+{template .locationList_assets}
+  // FYI: This switch is necessary because webpack's replace-hash functionality
+  // needs to find the output file name in this file in order to add the hash to
+  // the end when we go to prod.  We could write our own hash replacer to simplify
+  // this in the future.
+  {switch $siteInternalHostName}
+    {default}
+      <link rel="stylesheet" type="text/css" href="{$baseUrl}primary/locationList/styles.css" data-webpack-inline-force>
+      {switch $locale}
+        {case 'en'}
+          <script src="{$baseUrl}primary/locationList/en.js" async defer data-webpack-inline></script>
+        {default}
+          <script src="{$baseUrl}primary/locationList/en.js" async defer data-webpack-inline></script>
+      {/switch}
+  {/switch}
+{/template}
+
+/**
+  * assets
+  * @param baseUrl
+  * @param locale
+  * @param siteInternalHostName
+  */
+{template .search_assets}
+  // FYI: This switch is necessary because webpack's replace-hash functionality
+  // needs to find the output file name in this file in order to add the hash to
+  // the end when we go to prod.  We could write our own hash replacer to simplify
+  // this in the future.
+  {switch $siteInternalHostName}
+    {default}
+      <link rel="stylesheet" type="text/css" href="{$baseUrl}primary/search/styles.css" data-webpack-inline-force>
+      {switch $locale}
+        {case 'en'}
+          <script src="{$baseUrl}primary/search/en.js" async defer data-webpack-inline></script>
+        {default}
+          <script src="{$baseUrl}primary/search/en.js" async defer data-webpack-inline></script>
+      {/switch}
+  {/switch}
+{/template}
+
+/**
+  * assets
+  * @param baseUrl
+  * @param locale
+  * @param siteInternalHostName
+  */
+{template .four_oh_four_assets}
+  // FYI: This switch is necessary because webpack's replace-hash functionality
+  // needs to find the output file name in this file in order to add the hash to
+  // the end when we go to prod.  We could write our own hash replacer to simplify
+  // this in the future.
+  {switch $siteInternalHostName}
+    {default}
+      <link rel="stylesheet" type="text/css" href="{$baseUrl}primary/four_oh_four/styles.css" data-webpack-inline-force>
+      {switch $locale}
+        {case 'en'}
+          <script src="{$baseUrl}primary/four_oh_four/en.js" async defer data-webpack-inline></script>
+        {default}
+          <script src="{$baseUrl}primary/four_oh_four/en.js" async defer data-webpack-inline></script>
+      {/switch}
+  {/switch}
+{/template}
+
+/**
+  * assets
+  * @param baseUrl
+  * @param locale
+  * @param siteInternalHostName
+  */
+{template .answers_assets}
+  // FYI: This switch is necessary because webpack's replace-hash functionality
+  // needs to find the output file name in this file in order to add the hash to
+  // the end when we go to prod.  We could write our own hash replacer to simplify
+  // this in the future.
+  {switch $siteInternalHostName}
+    {default}
+      <link rel="stylesheet" type="text/css" href="{$baseUrl}primary/answers/styles.css" data-webpack-inline-force>
+      {switch $locale}
+        {case 'en'}
+          <script src="{$baseUrl}primary/answers/en.js" async defer data-webpack-inline></script>
+        {default}
+          <script src="{$baseUrl}primary/answers/en.js" async defer data-webpack-inline></script>
+      {/switch}
+  {/switch}
+{/template}
+

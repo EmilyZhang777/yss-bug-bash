@@ -1,0 +1,107 @@
+{namespace common}
+
+/*
+{call common.Footer}
+  {param copyright: }
+  {param links: }
+  {param hideSchema: }
+  {param baseUrl: }
+  {param modifier: }
+
+  {param yaTrackSocial: /}
+  {param facebook_url: /}
+  {param twitter_url: /}
+  {param pinterest_url: /}
+  {param google_plus_url: /}
+  {param youtube_url: /}
+  {param instagram_url: /}
+  {param linkedin_url: /}
+{/call}
+*/
+
+/**
+ * This template is intended to be heavily modified.
+ * Please do not take it as gospel, it is likely not the best
+ * way to implement the design you've been given.
+ * If any parameters are not relevant to you remove them,
+ * if any piece of the layout isn't relevant, remove it.
+ * THIS IS ESPECIALLY TRUE OF SCHEMA AND THE SOCIAL STUFF.
+ * The copyright logic is probably the only thing you need to preserve.
+ * @param? copyright
+ * @param? links
+ * @param? hideSchema
+ * @param baseUrl
+ * @param? modifier
+ *
+ * Social Component
+ * @param? yaTrackSocial
+ * @param? facebook_url
+ * @param? twitter_url
+ * @param? pinterest_url
+ * @param? google_plus_url
+ * @param? youtube_url
+ * @param? instagram_url
+ * @param? linkedin_url
+*/
+{template .Footer}
+  <footer class="Footer{if $modifier} {$modifier}{/if}" data-ya-scope="footer">
+    <div class="l-container">
+      {if $facebook_url or
+          $twitter_url or
+          $pinterest_url or
+          $google_plus_url or
+          $youtube_url or
+          $instagram_url or
+          $linkedin_url}
+        <div class="l-row">
+          <div class="l-col-xs-12 l-col-sm-12-up">
+            {call components.Social.Links data="all"}
+              {param yaTrack: $yaTrackSocial /}
+              {param facebook_url: $facebook_url /}
+              {param twitter_url: $twitter_url /}
+              {param pinterest_url: $pinterest_url /}
+              {param google_plus_url: $google_plus_url /}
+              {param youtube_url: $youtube_url /}
+              {param linkedin_url: $linkedin_url /}
+              {param instagram_url: $instagram_url /}
+            {/call}
+          </div>
+        </div>
+      {/if}
+      {if $links}
+        <div class="l-row">
+          <div class="l-col-xs-12 l-col-sm-12-up">
+            <div class="Footer-links-wrapper">
+              <ul class="Footer-links">
+                {foreach $link in $links}
+                  <li class="Footer-link-wrapper">
+                    <div class="h6">
+                      <a href="{$link.href}"
+                         class="Footer-link"
+                         {call common.helpers.link_new_tab /}
+                         {if not $hideSchema} itemprop="relatedlink"{sp}{/if}
+                         data-ya-track="link#">
+                        {$link.title}
+                      </a>
+                    </div>
+                  </li>
+                {/foreach}
+              </ul>
+            </div>
+          </div>
+        </div>
+      {/if}
+      <div class="l-row">
+        <div class="l-col-xs-12 l-col-sm-12-up">
+          <div class="Footer-copyright">
+            {if $copyright}
+              {$copyright |noAutoescape}
+            {else}
+              &copy; {currentYear()}
+            {/if}
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+{/template}

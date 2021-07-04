@@ -1,0 +1,74 @@
+{namespace directory}
+
+
+/**
+ * Skips a directory level if there is only one location by auto redirecting
+ * to that location.
+ * @param baseUrl
+ * @param keys
+ */
+{template .skip_directory_level}
+  {if length($keys) == 1}
+    <meta http-equiv="refresh" content="1;URL={$baseUrl}{$keys[0].url}">
+    <script>
+      window.location.href = "{$baseUrl}{$keys[0].url}"
+    </script>
+  {/if}
+{/template}
+
+/**
+ * @param key
+ * @param? pageLevel
+ */
+{template .directory_list_link_title}
+  {if $pageLevel == 'Country'}
+    {$key.entity.derivedData.address.countryName}
+  {elseif $pageLevel == 'State'}
+    {$key.entity.derivedData.address.stateName} // GENERATOR TODO: Change this to use custom func
+  {else}
+    {$key.key|abbr:false}
+  {/if}
+{/template}
+
+/**
+* @param node object from directoryHierarchy
+*/
+{template .next_child_url}
+  {if isNonnull($node.children) and length(keys($node.children)) == 1}
+    {let $children: keys($node.children) /}
+    {let $url: $children[0] /}
+    // For scenarios when entities are shown on directories but do not have dedicated pages.
+    {if strContains($url, 'virtual:')}
+      {$node.url}
+    {else}
+      {call .next_child_url}
+        {param node: $node.children[$url] /}
+      {/call}
+    {/if}
+  {else}
+    {$node.url}
+  {/if}
+{/template}
+
+/**
+* @param directoryHierarchy
+* @param key
+*/
+{template .url_for_key}
+  {if $directoryHierarchy[$key.url]}
+    {call .next_child_url}
+      {param node: $directoryHierarchy[$key.url] /}
+    {/call}
+  {else}
+    {$key.url}
+  {/if}
+{/template}
+
+/**
+ * {call directory.helpers.location_grid_link_title data="$key.entity.profile" /}
+ * @param name
+ * @param address
+ */
+{template .location_grid_link_title}
+  {$name} at {$address.line1}
+{/template}

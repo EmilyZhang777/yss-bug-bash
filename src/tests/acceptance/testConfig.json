@@ -1,0 +1,11 @@
+{
+  "emily-demo": {
+    "entities": [],
+    "hosts": {
+      "local": "https://localhost:9028",
+      "staging": "https://test:test@emily-demo.yextpages.net",
+      "prod": "https://emily-demo",
+      "proxy": "http://emily-demo.yextpages.net"
+    }
+  }
+}

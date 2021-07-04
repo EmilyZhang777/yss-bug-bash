@@ -1,0 +1,74 @@
+{namespace locationEntity.modules}
+
+/**
+ * @param locale
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param relatedData
+ */
+{template .Core}
+  <div class="Core" data-ya-scope="core">
+    <div class="Core-container l-container">
+      <div class="l-row">
+        <div class="Core-info l-col-xs-12 l-col-sm-12 l-col-md-8-up">
+          <h1 class="Core-name">
+            {call common.modules.LocationName data="all" /}
+          </h1>
+
+          <div class="Core-hours">
+            {call components.Hours.HoursToday data="all"}
+              {param hours: $profile.hours.normalHours /}
+              {param hideSchema: true /}
+            {/call}
+          </div>
+
+          <div class="l-row">
+            <div class="l-col-xs-12 l-col-sm-6-up">
+              <div class="Core-address">
+                {call components.Address.Address data="all"}
+                  {param regionAbbr: true /}
+                  {param itemRefId: 'address' /}
+                {/call}
+              </div>
+
+              <div class="Core-phone">
+                {call components.Phone.Phones data="all"}
+                  {param phoneTypes: ['main'] /}
+                {/call}
+              </div>
+
+              <div class="Core-directions">
+                {call components.Maps.GetDirections data="all" /}
+              </div>
+
+              {if $profile.c_primaryCTAURL and $profile.c_primaryCTACopy}
+                <a class="Core-cta" href="{$profile.c_primaryCTAURL}">
+                  {$profile.c_primaryCTACopy | noAutoescape}
+                </a>
+              {/if}
+            </div>
+
+            <div class="l-col-xs-12 l-col-sm-6-up">
+              {call components.Hours.Hours data="all"}
+                {param hours: $profile.hours.normalHours /}
+                {param additionalHoursText: $profile.additionalHoursText /}
+              {/call}
+            </div>
+          </div>
+        </div>
+
+        <div class="Core-map l-col-xs-12 l-col-sm-12 l-col-md-4-up">
+          {call components.LocationMap.LocationMap data="all"}
+            {param itemRefs: 'telephone address location-name' /}
+            {param provider: 'Google' /}
+            {param providerApiKey}
+              {call secrets.YextMapsKeyGoogle /}
+            {/param}
+          {/call}
+        </div>
+      </div>
+    </div>
+  </div>
+{/template}

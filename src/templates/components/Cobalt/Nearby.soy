@@ -1,0 +1,96 @@
+{namespace cobalt.nearby}
+
+/**
+ * Nearby params
+ * @param baseUrl
+ * @param title
+ * @param nearbyLocations
+ * @param locale
+ * @param? includeLinkToRootOrLocator
+ * @param? linkToLocator
+ * @param? centerContent // When less than max results, center the results or make them wider. Boolean
+ * @param? buttonText
+ * Passthrough params
+ * @param? teaserModifier
+ * @param? teaserHLevel
+ * Cobalt Params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ * @param? maxLocations
+ */
+{template .ace}
+
+  <{$htmlTag ?: 'div'} class="Nearby Nearby--ace{if $modifier} {$modifier}{/if}" data-ya-scope="nearby">
+    <div class="Nearby-row">
+      <h{$hLevel ?: '2'} class="Nearby-title">
+        {$title |noAutoescape}
+      </h{$hLevel ?: '2'}>
+    </div>
+    <ul class="Nearby-locs Nearby-row {if $centerContent}Nearby-row--center{else}Nearby-row--widen{/if}">
+      {foreach $loc in $nearbyLocations}
+        {if index($loc) < ($maxLocations ?: 4)}
+          <li class="Nearby-loc">
+            {call common.modules.Teaser data="$loc"}
+              {param baseUrl: $baseUrl /}
+              {param modifier: $teaserModifier /}
+              {param hLevel: $teaserHLevel /}
+              {param callerTemplateName: 'cobalt.nearby.ace' /}
+            {/call}
+          </li>
+        {/if}
+      {/foreach}
+    </ul>
+    {if $includeLinkToRootOrLocator}
+      {let $nearbyLinkURL}
+        {if $linkToLocator}
+          {call url.search data="all" /}
+        {else}
+          {call url.root_page data="all" /}
+        {/if}
+      {/let}
+      {let $defaultButtonText}
+        {call strings.linkToLocatorText /}
+      {/let}
+      <div class="Nearby-row">
+        <div class="Nearby-linkWrapper">
+          <a class="Nearby-link"
+             href="{$baseUrl}{$nearbyLinkURL}"
+             {if $linkToLocator}{sp}data-ya-track="visitlocator"
+             {elseif $yaTrackName}{sp}data-ya-track="{$yaTrackName}"
+             {/if}>
+             {$buttonText ?: $defaultButtonText}
+          </a>
+        </div>
+      </div>
+    {/if}
+  </{$htmlTag ?: 'div'}>
+{/template}
+
+
+/**
+ * @param siteAttributes
+ * Nearby params
+ * @param baseUrl
+ * @param nearbyLocations
+ * @param locale
+ * @param? includeLinkToRootOrLocator
+ * @param? linkToLocator
+ * @param? centerContent // When less than max results, center the results or make them wider. Boolean
+ * @param? buttonText
+ * Passthrough params
+ * @param? teaserModifier
+ * @param? teaserHLevel
+ * Cobalt Params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ * @param? maxLocations
+ */
+{template .ace_default}
+  {call .ace data="all"}
+    {param title: $siteAttributes['Nearby Locations Title'] /}
+  {/call}
+{/template}

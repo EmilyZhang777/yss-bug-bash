@@ -1,0 +1,80 @@
+//
+// sass/common/layout.scss
+//
+// Put global layouts stylings here
+//
+
+/// Consolidates z-index logic in one place for readability
+///   An element needs both 'z-index' and 'position != static' to create
+///     a Stacking Context.
+///
+///   Stacking Context is a nested pattern - if an element creates a Stacking
+///     Context above another element, all children of the first element will
+///     render above the second. For example, if we use the z-indices below,
+///     'button' (z-index: 5) will still render above 'header' (z-index: 10)
+///     since it is a descendant of 'modal', which creates a Stacking Context
+///     above 'header'.
+///
+///   Note that the previous example assumes that the structure of the $z-index
+///     map matches how the elements are nested in the DOM (i.e. 'button' should
+///     be a descendant of 'modal', and 'header'/'modal' should not have any
+///     nested relationship).
+///
+///   For more info about z-index:
+///     https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index
+
+// Usage: @include z-index('header')
+//    or: @include z-index('modal') -> defaults to '_' value
+//    or: @include z-index('modal', 'button') -> can nest infinitely
+$z-index: (
+  'header': 10,
+  'modal': (
+    '_': 30,
+    'button': 5,
+  )
+);
+
+@function map-deep-get($map, $keys...)
+{
+  $val: $map;
+
+  @each $key in $keys
+  {
+    @if map-has-key($val, $key)
+    {
+      $val: map-get($val, $key);
+    }
+
+    @else
+    {
+      @error "No value found for `#{$key}` in `#{$val}`.";
+
+      @return null;
+    }
+  }
+
+  @return $val;
+}
+
+@mixin z-index($keys...)
+{
+  $val: map-deep-get($z-index, $keys...);
+
+  @if type-of($val) == 'map'
+  {
+    @if map-has-key($val, '_')
+    {
+      z-index: map-get($val, '_');
+    }
+
+    @else
+    {
+      @error "Expected to find a z-index value at `#{$val}._` since `#{$val}` is a map and not a valid z-index";
+    }
+  }
+
+  @else
+  {
+    z-index: $val;
+  }
+}

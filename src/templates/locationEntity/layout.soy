@@ -1,0 +1,102 @@
+{namespace locationEntity}
+
+/**
+ * @param baseUrl
+ * @param businessId
+ * @param crumbNames
+ * @param crumbUrls
+ * @param entityPageSetId
+ * @param isHttps
+ * @param isStaging
+ * @param locale
+ * @param siteAttributes
+ * @param siteDomain
+ * @param siteId
+ * @param siteInternalHostName
+ * @param soyTemplateName
+ * @param versions
+ *
+ * Entity params
+ * @param profile
+ * @param relatedData
+ * @param derivedData
+ */
+{template .layout}
+
+  {let $title} // TODO: update the page title
+    {msg desc="Title of the web page that uses the entity name, city, state, and address."}
+      {$profile.name |noAutoescape} in {$profile.address.city}, {$profile.address.region} | {$profile.address.line1}
+    {/msg}
+  {/let}
+  {let $logo}
+    {call common.helpers.image_url}
+      {param image: $profile.logo /}
+      {param size: '150x150' /}
+    {/call}
+  {/let}
+  {call common.layout data="all"}
+    {param pageTitle: $title /}
+    {param logo: $logo /}
+    {param metaDescription: $profile.description /}  // TODO: update the meta description
+    {param metaKeywords}
+      {if length($profile.keywords ?: []) > 0}
+        {call components.Util.Join}
+          {param list: $profile.keywords /}
+        {/call}
+      {else}
+        {call common.helpers.keywords /}
+      {/if}
+    {/param}
+
+    {param headInclude}
+      {if $profile.yextDisplayCoordinate}
+        <meta name="geo.position" content="{$profile.yextDisplayCoordinate.lat};{$profile.yextDisplayCoordinate.long}">
+      {/if}
+      <meta name="geo.placename" content="{$profile.address.city},{$profile.address.region |abbr:false}">
+      <meta name="geo.region" content="{$derivedData.address.countryName}-{$profile.address.region}">
+      {call common.include.locationEntity_assets data="all" /}
+    {/param}
+
+    // TODO: Update the schema scope
+    {param schemaScope}
+      itemscope itemtype="http://schema.org/LocalBusiness" itemid="{call components.Util.Absolutize data="all"}{param path: '#' + $profile.meta.yextId /}{/call}"
+    {/param}
+
+    {param pageContent}
+      // This is included here to make sure that there is an image schema tag on the page
+      // If there is a storefront or headshot photo that should be the primary image rather
+      // than the brand logo, mark that up as the image and include this as the fallback
+      {call components.Schema.Image_logo}
+        {param logo: $logo /}
+      {/call}
+
+      // Sets default price range if specified through a profile field
+      {if $profile.priceRange}
+        <meta itemprop="priceRange" content="{$profile.priceRange}">
+      {/if}
+
+      {call cobalt.core.ace_default data="all"}
+        {param mapProvider: 'Google' /}
+        {param mapApiKey}
+          {call secrets.YextMapsKeyGoogle /}
+        {/param}
+      {/call}
+
+    {/param}
+
+    {param pageLevel: 'locationEntity' /}
+
+    {param analytics}
+      {call components.YextAnalytics.Entity data="all" /}
+      {call components.GoogleAnalytics.Geo data="all"}
+        {param analyticsMap: $siteAttributes?.google_analytics ?: [:] /}
+        {param city: $profile.address.city /}
+        {param state}
+          {$profile.address.region |abbr:false}
+        {/param}
+        {param resultCount: 1 /}
+      {/call}
+    {/param}
+
+  {/call}
+{/template}

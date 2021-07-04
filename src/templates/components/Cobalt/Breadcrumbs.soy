@@ -1,0 +1,29 @@
+{namespace cobalt.breadcrumbs}
+
+/**
+ * About params
+ * @param baseUrl
+ * @param crumbNames
+ * @param crumbUrls
+ * @param? crumbBaseName
+ * @param? crumbSeparator
+ * @param? modifier
+ * @param? hideSchema
+ * @param? abbrState
+ * @param? suppressIndexHtml
+ */
+{template .ace}
+  <div class="Breadcrumbs Breadcrumbs--ace{if $modifier} {$modifier}{/if}">
+    {call components.Breadcrumbs.Breadcrumbs data="all"}
+      {param crumbBaseName}
+        {if $crumbBaseName}
+          {$crumbBaseName}
+        {else}
+          {call strings.breadcrumbs_crumbBaseName /}
+        {/if}
+      {/param}
+      {param hideSchema: $hideSchema ?: '' /}
+      {param separator: $crumbSeparator ?: '' /}
+    {/call}
+  </div>
+{/template}

@@ -1,0 +1,24 @@
+assets/generated
+assets/modules
+docker/soy2jslinux
+node_modules
+sass/generated
+templates/generated
+tests/unit/testdata/generated
+tests/webdriver/logs
+tests/webdriver/screenshots
+*.log
+.bowerrc
+.bundle
+.DS_Store
+.sass-cache
+.tmp
+soydirectories.json
+entries.js
+postinstall.js
+Gruntfile.js
+
+# robots.txt is generated from a template by default, so try to prevent manual creation
+# See https://yexttest.atlassian.net/browse/PC-18338
+desktop/robots.txt
+mobile/robots.txt

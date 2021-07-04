@@ -1,0 +1,156 @@
+{namespace cobalt.header}
+
+/**
+ * @param logoImage
+ * @param logoLink
+ * @param? modifier
+ * @param? useSiteAttributeLinks
+ * @param siteAttributes
+ * @param? links
+ * @param? linksOnLeft
+ * @param? centerLogoOnMobile
+ */
+{template .ace}
+
+  {let $mainNavLabel}
+    {call strings.header_mainNavLabel /}
+  {/let}
+
+  {let $overlayLabelMsg}
+    {call strings.header_overlayLabelMsg /}
+  {/let}
+
+  {let $headerLogo}
+    <div class="Header-logoWrapper{if $centerLogoOnMobile} Header-logoWrapper--centered{/if}">
+      {if $logoImage}
+        {if $logoLink}
+          <a class="Header-logoLink"
+             href="{$logoLink}"
+             data-ya-track="logo">
+            <span class="sr-only">
+              {call strings.header_logoLinkLabel /}
+            </span>
+        {/if}
+        <img class="Header-logoImage"
+             src="{$logoImage}"
+             alt=""
+             id="brand-logo">
+        {if $logoLink}
+          </a>
+        {/if}
+      {/if}
+    </div>
+  {/let}
+
+  <header class="Header{if $modifier} Header--{$modifier}{/if}"
+          id="Header"
+          data-ya-scope="header">
+    <div class="Header-wrapper">
+      <div class="Header-container l-container">
+        <div class="Header-main{if $centerLogoOnMobile and $linksOnLeft} Header-main--left{elseif $centerLogoOnMobile} Header-main--right{/if}">
+          {if not $linksOnLeft}
+            {$headerLogo |noAutoescape}
+          {/if}
+          <nav class="Header-menuMain" aria-label="{$mainNavLabel}">
+            <div class="Header-toggle l-visible-only-xs">
+              {call .Header_mobileMenuToggle data="all" /}
+            </div>
+            <div class="Header-content" id="Header-content">
+              <ul class="Header-menu"
+                id="Header-menu"
+                role="menubar"
+                aria-hidden="false"
+                aria-label="{$mainNavLabel}">
+                {if $useSiteAttributeLinks and not length($links ?: [])}
+                  {let $headerLinks: $siteAttributes?.header ?: [:] /}
+                  {let $totalLinks: (length(keys($headerLinks)) > 0) ? (floor((length(keys($headerLinks)) - 1) / 2) + 1) : 1 /}
+                  {for $i in range($totalLinks)}
+                    {if $headerLinks['text' + ($i + 1)] and $headerLinks['href' + ($i + 1)]}
+                      {call .Header_navItem data="all"}
+                        {param url: $headerLinks['href' + ($i + 1)] /}
+                        {param text: $headerLinks['text' + ($i + 1)] /}
+                        {param yaName: $headerLinks['ya_track' + ($i + 1)] ?: 'link#' /}
+                      {/call}
+                    {/if}
+                  {/for}
+                {elseif not $useSiteAttributeLinks and length($links ?: [])}
+                  {foreach $link in $links}
+                    {call .Header_navItem data="all"}
+                      {param url: $link.href /}
+                      {param text: $link.text /}
+                      {param yaName: $link.yaTrack ?: 'link#' /}
+                    {/call}
+                  {/foreach}
+                {/if}
+              </ul>
+            </div>
+          </nav>
+          {if $linksOnLeft}
+            {$headerLogo |noAutoescape}
+          {/if}
+        </div>
+      </div>
+    </div>
+    {call .Header_overlay data="all"}
+      {param overlayLabelMsg: $overlayLabelMsg /}
+    {/call}
+  </header>
+
+{/template}
+
+/**
+ * @param url
+ * @param text
+ * @param yaName
+ */
+{template .Header_navItem}
+
+  <li class="Header-menuItem" role="presentation">
+    <a class="Header-link Text--small"
+       href="{$url}"
+       data-ya-track="{$yaName}"
+       role="menuitem">
+      <span class="Header-linkText">
+        {$text |noAutoescape}
+      </span>
+    </a>
+  </li>
+
+{/template}
+
+/**
+ * Mobile button for toggling header
+ */
+{template .Header_mobileMenuToggle}
+
+  <button class="Header-toggleIcon"
+          aria-expanded="false"
+          aria-controls="Header-menu"
+          aria-haspopup="menu"
+          id="Header-toggleIcon">
+    <span class="Header-menuBar"></span>
+    <span class="Header-menuBar"></span>
+    <span class="Header-menuBar"></span>
+    <span class="Header-menuBar"></span>
+    <span class="sr-only">
+      {call strings.header_mobileOpenLabel /}
+    </span>
+  </button>
+
+{/template}
+
+/**
+ * @param overlayLabelMsg
+ */
+{template .Header_overlay}
+
+  <button class="Header-overlay l-visible-only-xs"
+          id="Header-overlay"
+          aria-label="{$overlayLabelMsg}"
+          aria-hidden="true"
+          aria-expanded="false"
+          aria-controls="Header-menu"
+          tabindex="-1">
+  </button>
+
+{/template}

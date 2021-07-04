@@ -1,0 +1,51 @@
+// This file contains styling mixins that are provided for convenience
+// They are meant to be overridden or replaced
+
+// Utility Mixins:
+@import '~@yext/components-util';
+
+@mixin html-styles
+{
+  i,
+  em
+  {
+    font-style: italic;
+  }
+
+  b,
+  strong
+  {
+    font-weight: $font-weight-bold;
+  }
+
+  a
+  {
+    text-decoration: underline;
+
+    &:hover
+    {
+      text-decoration: none;
+    }
+  }
+
+  ol
+  {
+    list-style-type: decimal;
+  }
+
+  ul
+  {
+    list-style: disc;
+  }
+
+  ol,
+  ul
+  {
+    list-style-position: inside;
+  }
+
+  li
+  {
+    margin-left: 25px;
+  }
+}

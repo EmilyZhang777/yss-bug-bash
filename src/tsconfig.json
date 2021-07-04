@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "allowJs": true,
+    "module": "es6",
+    "baseUrl": ".",
+    "lib": ["DOM", "ES6", "DOM.Iterable", "ScriptHost"]
+  }
+}

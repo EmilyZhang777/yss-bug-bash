@@ -1,0 +1,53 @@
+{namespace directory}
+
+/**
+ * Template that displays all keys in the directory in a list view with a dynamic map.
+ *
+ * @param baseUrl
+ * @param businessId
+ * @param crumbNames
+ * @param crumbUrls
+ * @param directoryId
+ * @param locale
+ * @param siteAttributes
+ * @param siteDomain
+ * @param siteId
+ * @param siteInternalHostName
+ * @param versions
+ *
+ * Content params
+ * @param directoryHierarchy Map
+ * @param entityCount
+ * @param keys List of Maps
+ *
+ * Configuration params
+ * @param isStaging
+ * @param isHttps
+ * @param soyTemplateName
+ */
+{template .stateList}
+
+  {call .layout data="all"}
+    {param headInclude}
+      {call common.include.stateList_assets data="all" /}
+    {/param}
+    {param pageContent}
+      {call cobalt.directory.ace_list data="all"}
+        {param title}
+          {msg desc="X number of locations within a country or region."}
+            {plural $entityCount}
+              {case 1}
+                {$keys[0].entity.profile.name} Location
+              {default}
+                {$keys[0].entity.profile.name} Locations
+            {/plural}
+          {/msg}
+        {/param}
+        {param htmlTag: 'section' /}
+        {param modifier: 'StateList' /}
+        {param pageLevel: 'State' /}
+      {/call}
+    {/param}
+  {/call}
+
+{/template}

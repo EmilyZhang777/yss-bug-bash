@@ -1,0 +1,132 @@
+{namespace common}
+
+/**
+ * This template is intended to be heavily modified as needed on each implementation.
+ * It is intended to keep elements that are common to every page on the site in this template.
+ * The templating structure is heavily inspired by the hierarchy of templates in Rails.
+ * See http://guides.rubyonrails.org/layouts_and_rendering.html#understanding-yield for more information.
+ *
+ * @param baseUrl
+ * @param crumbNames
+ * @param crumbUrls
+ * @param isHttps
+ * @param isStaging
+ * @param locale
+ * @param siteAttributes
+ * @param siteDomain
+ * @param siteId
+ * @param siteInternalHostName
+ * @param? soyTemplateName
+ * @param versions
+ *
+ * Entity params
+ * @param? profile
+ *
+ * Content params
+ * @param analytics
+ * @param metaDescription
+ * @param metaKeywords
+ * @param pageContent
+ * @param pageTitle
+ * @param? bodyInclude
+ * @param? headInclude
+ * @param? logo
+ *
+ * Configuration params
+ * @param pageLevel
+ * @param? hideBreadcrumbs
+ * @param? hideFooter
+ * @param? hideHeader
+ * @param? schemaScope
+ * @param? showBackToTop
+ */
+{template .layout}
+  <!doctype html>
+  <html id="yext-html" lang="{$locale|rreplace:'_','-'}"> // See here: http://www.w3.org/International/questions/qa-lang-why.en
+    <head>
+      {call common.head_tags data="all"}
+        {param logo: $logo /}
+        {param title: $pageTitle /}
+        {param keywords: $metaKeywords /}
+        {param description: $metaDescription /}
+        {param includeAlternateLinks: false /} // Set to true to add hreflang links to other locales
+      {/call}
+      {call .favicons data="all"}
+        {param useGeneratedFavicons: false /} //TODO: set to true if supplying a favicon.png in the favicon folder
+      {/call}
+
+      {call common.helpers.set_baseUrl data="all" /}
+      {call common.helpers.set_locale data="all" /}
+      {call components.Monitoring.Init data="all" /}
+      {call common.helpers.init_enableYextAnalytics}
+        {param defaultEnabled: true /} // TODO: Set to false if needed to let clients enable analytics with window.enableYextAnalytics()
+      {/call}
+
+      {$headInclude ?: '' |noAutoescape}
+      {if $schemaScope}
+        <link id="page-url" itemprop="url" href="{call common.helpers.canonical_link_url data="all" /}">
+      {/if}
+
+      {call common.helpers.google_analytics data="all"}
+        {param address: $profile?.address /}
+      {/call}
+
+      {call common.helpers.google_tag_manager_head data="all" /}
+
+      {$analytics |noAutoescape}
+    </head>
+    <body id="yext" class="Text">
+      // See here: http://webaim.org/techniques/skipnav/
+      <a href="#first-anchor" class="sr-only sr-only-focusable" id="skip-nav">
+        Skip to content
+      </a>
+
+      {call common.helpers.google_tag_manager_body data="all" /}
+
+      // The cobalt ace header is an out of the box header with some commonly found functionalities
+      // if significant changes need to be made to cater to the client, consider calling common.Header instead
+      {if not $hideHeader}
+        {call cobalt.header.ace data="all"}
+          {param useSiteAttributeLinks: true /}
+          {param logoImage: $siteAttributes?.logo?.image ?: '' /}
+          {param logoLink: $siteAttributes?.logo?.href ?: '' /}
+        {/call}
+      {/if}
+
+      <main id="main" class="Main"{if $schemaScope} {$schemaScope |noAutoescape} itemref="brand-logo page-url"{/if}>
+        <a href="#skip-nav" class="sr-only sr-only-focusable" id="first-anchor">
+          Return to Nav
+        </a>
+
+        <div class="Main-content">
+          {$pageContent |noAutoescape}
+
+          // Sometimes the design team asks for this back to top links.
+          // Searcher will automatically show it by default if it has a lot of results,
+          // but for many designs it is not relevant, so remove it if you don't need.
+          // Dead (unused) code is bad code.
+          {if $showBackToTop}
+            <div class="l-container back-to-top-container">
+              <a class="back-to-top"
+                 href="#first-anchor">
+                Back to top <span class="icon-up-big" aria-hidden="true"></span>
+              </a>
+            </div>
+          {/if}
+        </div>
+      </main>
+
+      {if not $hideFooter}
+        {if not $hideBreadcrumbs}
+          <div class="l-container Main-breadcrumbs">
+            {call components.Breadcrumbs.Breadcrumbs data="all" /}
+          </div>
+        {/if}
+        {call common.Footer data="all"}
+          {param yaTrackSocial: true /}
+        {/call}
+      {/if}
+      {$bodyInclude ?: '' |noAutoescape}
+    </body>
+  </html>
+{/template}

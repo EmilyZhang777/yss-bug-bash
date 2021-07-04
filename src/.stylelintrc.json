@@ -1,0 +1,21 @@
+{
+	"extends": "stylelint-config-standard",
+	"plugins": [
+		"stylelint-selector-bem-pattern"
+	],
+	"rules": {
+		"plugin/selector-bem-pattern": { "preset": "suit" },
+		"indentation": 2,
+		"max-nesting-depth": [
+			3,
+			{"ignoreAtRules": ["media", "include", "mixin"]}
+		],
+		"max-line-length": 120,
+		"block-opening-brace-space-before": "always-single-line",
+		"block-closing-brace-space-before": "always-single-line",
+		"block-opening-brace-newline-before": "always-multi-line",
+		"block-closing-brace-newline-before": "always-multi-line",
+		"declaration-block-no-redundant-longhand-properties": null,
+		"declaration-empty-line-before": null
+	}
+}

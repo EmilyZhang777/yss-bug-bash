@@ -1,0 +1,122 @@
+/** @define FAQ */
+
+$faq-toggle-line: 2px solid $brand-primary !default;
+
+.FAQ
+{
+  &--ace &-title
+  {
+    width: 100%;
+    text-align: center;
+    margin-bottom: $padded-padding;
+  }
+
+  &--ace &-listItem
+  {
+    width: 100%;
+    padding: $padded-padding;
+    border-top: $border-default;
+
+    &:last-child
+    {
+      border-bottom: $border-default;
+    }
+
+    &:not(.is-expanded)
+    {
+      .FAQ-answer
+      {
+        height: 0;
+      }
+    }
+
+    &.is-expanded
+    {
+      .FAQ-toggleIcon
+      {
+        transform: rotate(0deg);
+
+        &::before
+        {
+          content: '';
+          display: block;
+          width: 0;
+          height: 0;
+          border-bottom: $faq-toggle-line;
+          position: absolute;
+          bottom: 11px;
+          transform: rotate(90deg);
+        }
+      }
+    }
+  }
+
+  &--ace &-toggleIcon
+  {
+    display: inline-block;
+    transition: all 0.65s ease;
+    width: 24px;
+    height: 24px;
+    transform: rotate(180deg);
+    position: relative;
+    margin: auto 8px auto 0;
+
+    &::before
+    {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 0;
+      border-bottom: $faq-toggle-line;
+      position: absolute;
+      bottom: 11px;
+      transform: rotate(90deg);
+      transition: all 0.65s ease;
+    }
+
+    &::after
+    {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 0;
+      border-bottom: $faq-toggle-line;
+      position: absolute;
+      bottom: 11px;
+    }
+  }
+
+  &--ace &-question
+  {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  &--ace &-questionTextRow
+  {
+    width: 100%;
+    font-weight: $font-weight-bold;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &--ace &-questionText
+  {
+    text-align: left;
+  }
+
+  &--ace &-answer
+  {
+    overflow-y: hidden;
+    transition: all 0.65s ease;
+    display: block;
+  }
+
+  &--ace &-answerText
+  {
+    text-align: left;
+    padding-top: $padded-padding;
+    display: inline-block;
+  }
+}

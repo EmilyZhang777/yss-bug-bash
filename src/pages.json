@@ -1,0 +1,41 @@
+{
+  "templates" : [
+    {
+      "name": "locationEntity.layout",
+      "dataUrl": null
+    },
+    {
+      "name": "static.robotstxt",
+      "dataUrl": null
+    },
+    {
+      "name": "static.four_oh_four",
+      "dataUrl": null
+    },
+    {
+      "name": "directory.stateList",
+      "dataUrl": null
+    },
+    {
+      "name": "directory.cityList",
+      "dataUrl": null
+    },
+    {
+      "name": "directory.locationList",
+      "dataUrl": null
+    },
+    {
+      "name": "search.layout",
+      "dataUrl": null
+    }
+  ],
+  "auth": {
+    "username": "test",
+    "password": "test"
+  },
+  "proxy": {
+    "hosts": [],
+    "searchUrls": ["search"]
+  },
+  "hostname": "emily-demo"
+}
