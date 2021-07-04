@@ -6,16 +6,10 @@
   "templateVersion": 8,
   "features": [
     {
-      "name": "Locations",
-      "entityPageSet": {
-        "urlTemplate": "url.location",
-        "template": "locationEntity.layout",
-        "entityType": "location",
-        "urlAliases": [
-          "url.idAlias"
-        ],
-        "nearbyRadius": 50,
-        "nearbyMax": 10
+      "name": "Home",
+      "staticPage": {
+        "urlTemplate": "url.home",
+        "template": "static.home"
       }
     },
     {
@@ -90,37 +84,6 @@
           }
         ],
         "entityPageSet": "Locations"
-      }
-    },
-    {
-      "name": "Search",
-      "entitySearch": {
-        "pageSet": "Locations",
-        "urlTemplate": "url.search",
-        "template": "search.layout",
-        "filterTemplate": "search.filters_config",
-        "apiParams": [
-          {
-            "name": "location",
-            "queryParam": "q"
-          },
-          {
-            "name": "limit",
-            "queryParam": "per"
-          },
-          {
-            "name": "offset",
-            "queryParam": "offset"
-          },
-          {
-            "name": "radius",
-            "queryParam": "r"
-          },
-          {
-            "name": "languages",
-            "queryParam": "l"
-          }
-        ]
       }
     }
   ]

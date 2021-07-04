@@ -9,6 +9,28 @@
   <link rel="dns-prefetch" href="//www.google-analytics.com">
 {/template}
 
+/**
+  * assets
+  * @param baseUrl
+  * @param locale
+  * @param siteInternalHostName
+  */
+{template .home}
+  // FYI: This switch is necessary because webpack's replace-hash functionality
+  // needs to find the output file name in this file in order to add the hash to
+  // the end when we go to prod.  We could write our own hash replacer to simplify
+  // this in the future.
+  {switch $siteInternalHostName}
+    {default}
+      <link rel="stylesheet" type="text/css" href="{$baseUrl}primary/home/styles.css" data-webpack-inline-force>
+      {switch $locale}
+        {case 'en'}
+          <script src="{$baseUrl}primary/home/en.js" async defer data-webpack-inline></script>
+        {default}
+          <script src="{$baseUrl}primary/home/en.js" async defer data-webpack-inline></script>
+      {/switch}
+  {/switch}
+{/template}
 
 /**
   * assets

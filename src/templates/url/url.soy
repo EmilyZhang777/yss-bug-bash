@@ -1,5 +1,61 @@
 {namespace url autoescape="false"}
 
+
+/**
+ * @param locale
+ */
+{template .home}
+  {call .urlWithLocale data="all"}
+    {param url}
+      home
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ */
+{template .about}
+  {call .urlWithLocale data="all"}
+    {param url}
+      about-me
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ */
+{template .publications}
+  {call .urlWithLocale data="all"}
+    {param url}
+      publications
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ */
+{template .publications}
+  {call .urlWithLocale data="all"}
+    {param url}
+      publications
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ */
+{template .contact}
+  {call .urlWithLocale data="all"}
+    {param url}
+      contact
+    {/param}
+  {/call}
+{/template}
+
 /**
  * See https://yexttest.atlassian.net/browse/PC-38831 for why this is locale based
  * @param locale

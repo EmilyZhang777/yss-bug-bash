@@ -2,6 +2,7 @@ const { brandsPaths } = require('@yext/pages-buildtools/webpack/config.brands.js
 let externalTemplates = require('./entries.json');
 
 const templates = externalTemplates ? externalTemplates.templates : [
+  'home',
   'locationEntity',
   'stateList',
   'cityList',

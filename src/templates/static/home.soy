@@ -1,0 +1,41 @@
+{namespace static}
+
+/**
+ * @param isHttps
+ * @param locale
+ * @param siteDomain
+ * @param businessId
+ * @param isStaging
+ * @param siteAttributes
+ * @param siteId
+ * @param siteInternalHostName
+ * @param staticPageId
+ */
+{template .save_and_grow}
+  {let $baseUrl: $isStaging ? '/' : '//' + $siteDomain + '/' /}
+  {let $url}
+    {call url.home data="all" /}
+  {/let}
+  {call common.layout data="all"}
+    {param baseUrl: $baseUrl /}
+    {param crumbNames: [] /}
+    {param crumbUrls: [$url] /}
+    {param hideBreadcrumbs: true /}
+    {param metaKeywords: [] /}
+    {param pageLevel: 'home' /}
+
+    {param headInclude}
+      {call common.include.home data="all"}
+        {param baseUrl: $baseUrl /}
+      {/call}
+    {/param}
+
+    {param pageContent}
+      test
+    {/param}
+
+    {param analytics}
+      {call components.YextAnalytics.Static data="all" /}
+    {/param}
+  {/call}
+{/template}
