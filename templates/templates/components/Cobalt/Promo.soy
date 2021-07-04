@@ -1,0 +1,73 @@
+{namespace cobalt.promo}
+
+/**
+ * Promo params
+ * @param description
+ * @param details
+ * @param? clickthrough_url
+ * @param? photo
+ * @param? alternateText
+ * @param? buttonText
+ *
+ * Cobalt params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ */
+{template .ace}
+
+  <{$htmlTag ?: 'div'} class="Promo Promo--ace{if $modifier} {$modifier}{/if}">
+    <div class="Promo-row">
+      {if $photo}
+        <div class="Promo-imgWrapper">
+          <img src="{imageBySizeEntity($photo.image, '500x500')}"
+               class="Promo-img"
+               alt="{$photo.alternateText ? $photo.alternateText : $alternateText ?: ''}">
+        </div>
+      {/if}
+      <div class="Promo-info">
+        <h{$hLevel ?: '2'} class="Promo-title">
+          {$description |noAutoescape}
+        </h{$hLevel ?: '2'}>
+        <div class="Promo-text">
+          {$details |noAutoescape}
+        </div>
+        {if $clickthrough_url and $buttonText}
+          <div class="Promo-linkWrapper">
+            <a class="Promo-link"
+               href="{$clickthrough_url}"
+               data-ya-track="{$yaTrackName ?: 'promo'}">
+              {$buttonText |noAutoescape}
+            </a>
+          </div>
+        {/if}
+      </div>
+    </div>
+  </{$htmlTag ?: 'div'}>
+{/template}
+
+/**
+ * Expects data from the c_promo custom field
+ *
+ * c_promo params
+ * @param? title
+ * @param? description
+ * @param? photo
+ * @param? link
+ *
+ * Cobalt params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ */
+{template .ace_default}
+  {call .ace data="all"}
+    {param description: $title /}
+    {param details: $description /}
+    {param clickthrough_url: $link?.url /}
+    {param buttonText: $link?.linkText /}
+  {/call}
+{/template}
+

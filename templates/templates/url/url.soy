@@ -1,0 +1,181 @@
+{namespace url autoescape="false"}
+
+/**
+ * See https://yexttest.atlassian.net/browse/PC-38831 for why this is locale based
+ * @param locale
+ */
+{template .page_404}
+  {call .urlWithLocale data="all"}
+    {param url}
+      404.html
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ */
+{template .page_ieRedirect}
+  {call .urlWithLocale data="all"}
+    {param url}
+      ie.html
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * See https://yexttest.atlassian.net/browse/CPB-79 for why this is locale based
+ * @param locale
+ */
+{template .page_robotstxt}
+  {call .urlWithLocale data="all"}
+    {param url}
+      robots.txt
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ */
+{template .root_page}
+  {call .directoryStateList data="all" /}
+{/template}
+
+/**
+ */
+{template .xmlSitemap}
+  sitemap.xml
+{/template}
+
+/**
+ * @param locale
+ * @param profile
+ * @param? isCollision
+ */
+{template .location}
+  {call .urlWithLocale data="all"}
+    {param url}
+      {$profile.address.region}/
+      {$profile.address.city}/
+      {$profile.address.line1}
+      {if $isCollision}-{$profile.meta.id}{/if}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param profile
+ * @param? locale
+ */
+{template .reviews}
+  {call .urlWithLocale data="all"}
+    {param url}
+      feedback/{$profile.meta.id}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ */
+{template .directoryStateList}
+  {call .urlWithLocale data="all"}
+    {param url}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param address
+ * @param locale
+ */
+{template .directoryCityList}
+  {call .urlWithLocale data="all"}
+    {param url}
+      {$address.region}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param address
+ * @param locale
+ */
+{template .directoryLocationList}
+  {call .urlWithLocale data="all"}
+    {param url}
+      {$address.region}/
+      {$address.city}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ */
+{template .search}
+  {call .urlWithLocale data="all"}
+    {param url}
+      search
+    {/param}
+  {/call}
+{/template}
+
+/**
+  * Helper template for project root
+  * @param locale
+  * @param siteDomain
+  * @param isHttps
+  */
+{template .root}
+  http{if $isHttps}s{/if}://{$siteDomain}/{call .root_page data="all"}{/call}
+{/template}
+
+/**
+ * Helper template to insert locale for international pages
+ * @param url
+ * @param locale
+ */
+{template .urlWithLocale}
+  // Here is where you configure the "default" locale for the site.  This is the
+  // locale that you want to suppress from showing in the URL.
+  {if $locale != 'en'}
+    {$locale |casing:'lower'}
+    {if $url}
+      /
+    {/if}
+  {elseif not $url}
+    index.html
+  {/if}
+
+  {$url |spaces:'-' |casing:'lower' |rreplace:'[-$&`:<>[\\]{}+#%@;=?\\\\^|~]+','-' |rreplace:'-+$|^-+|[!"\',]'}
+{/template}
+
+/**
+ * URL template for the geocode endpoint
+ */
+{template .geocodeIp}
+  geocode-ip
+{/template}
+
+/**
+ * @param locale
+ * @param profile
+ */
+{template .idAlias}
+  {call .urlWithLocale data="all"}
+    {param url}
+      {$profile.meta.id}
+    {/param}
+  {/call}
+{/template}
+
+/**
+  * Helper template for project root
+  * @param siteDomain
+  * @param isHttps
+  */
+{template .protocolAndDomain}
+  http{if $isHttps}s{/if}://{$siteDomain}
+{/template}

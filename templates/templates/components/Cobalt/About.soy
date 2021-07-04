@@ -1,0 +1,90 @@
+{namespace cobalt.about}
+
+/**
+ * Content params
+ * @param title
+ * @param? aboutImageSrc
+ * @param? aboutImageAltText
+ * @param? buttonUrl
+ * @param? buttonText
+ *
+ * Passthrough params
+ * @param description
+ *
+ * Configuration params
+ * @param? hideSchema
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ */
+{template .ace}
+
+  <{$htmlTag ?: 'div'} class="About About--ace{if $modifier} {$modifier}{/if}" data-ya-scope="about">
+    <div class="About-row">
+      <div class="About-col">
+        <h{$hLevel ?: '2'} class="About-title">
+          {$title |noAutoescape}
+        </h{$hLevel ?: '2'}>
+        <div class="About-content">
+          <div class="About-description">
+            {call components.Description.Description data="all"}
+              {param allowHTML: true /}
+            {/call}
+          </div>
+          {if $buttonText and $buttonUrl}
+            <div class="About-buttonWrapper">
+              <a class="About-button"
+                href="{$buttonUrl}"
+                {if $yaTrackName}data-ya-track="{$yaTrackName}"{/if}>
+                {$buttonText |noAutoescape}
+              </a>
+            </div>
+          {/if}
+        </div>
+      </div>
+      {if $aboutImageSrc}
+        <div class="About-col">
+          <div class="About-content">
+            <img src="{$aboutImageSrc}"
+                class="About-img"
+                alt="{$aboutImageAltText ?: ''}"
+                {if not $hideSchema} itemprop="image"{/if}>
+          </div>
+        </div>
+      {/if}
+    </div>
+  </{$htmlTag ?: 'div'}>
+{/template}
+
+/**
+ * Expects data from the c_about default custom field
+ *
+ * c_about params
+ * @param? title
+ * @param? description
+ * @param? link
+ * @param? photo
+ *
+ * Configuration params
+ * @param? hideSchema
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ */
+{template .ace_default}
+  {call .ace data="all"}
+    {param title}
+      {if $title}
+        {$title |noAutoescape}
+      {else}
+        {call strings.about_title /}
+      {/if}
+    {/param}
+    {param buttonUrl: $link?.url /}
+    {param buttonText: $link?.linkText /}
+    {param aboutImageSrc: $photo ? imageBySizeEntity($photo.image, '500x') : '' /}
+    {param aboutImageAltText: $photo?.alternateText ?: '' /}
+  {/call}
+{/template}

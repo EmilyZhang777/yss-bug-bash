@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/Cobalt/Locator/Ace.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/Cobalt/Locator/Ace.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { Coordinate } from '@yext/components-geo';
+import { PinProperties } from '@yext/components-maps';
+import { smoothScroll } from '@yext/components-util';
+import { PinClickEvent, PinFocusEvent, PinHoverEvent } from './Events.js';
+
+/** @namespace CobaltAce */
+
+/**
+ * @memberof CobaltAce
+ * @param {Object} status A generic object whose properties define the state of the pin, from {@link MapPin#setStatus}
+ * @param {Object} entity The Yext entity associated with this pin
+ * @param {number} index The position of the entity in the results list, starting at 1
+ * @returns {PinProperties}
+ * @see MapPin~propertiesForStatus
+ */
+function pinPropertiesForStatus(status, entity, index) {
+  return new PinProperties()
+    .setIcon(
+      status.selected
+        ? 'selected'
+        : status.hovered || status.focused
+        ? 'hovered'
+        : 'default'
+    )
+    .setSRText(index)
+    .setZIndex(status.selected ? 1 : status.hovered || status.focused ? 2 : 0);
+}
+
+/**
+ * Build a {@link MapPin} for the given entity to be added to a locator map
+ * @memberof CobaltAce
+ * @param {MapPinOptions} pinOptions A MapPinOptions instance with its provider set to the same as the {@link Map} it's being built for.
+ * @param {Object} entity The Yext entity associated with this pin
+ * @param {number} index The position of the entity in the results list, starting at 1
+ * @param {HTMLElement} [scope=document] The element to dispatch events to
+ * @param {MapPin~propertiesForStatus} [propertiesForStatus=pinPropertiesForStatus] The pin's propertiesForStatus function
+ * @returns {MapPin}
+ */
+function buildPin(
+  pinOptions,
+  entity,
+  index,
+  scope = document,
+  propertiesForStatus = pinPropertiesForStatus
+) {
+  const pin = pinOptions
+    .withCoordinate(new Coordinate(entity.profile.yextDisplayCoordinate))
+    .withPropertiesForStatus((status) =>
+      propertiesForStatus(status, entity, index)
+    )
+    .build();
+
+  const id = 'js-yl-' + entity.profile.meta.id;
+
+  pin.setClickHandler(() => scope.dispatchEvent(new PinClickEvent(id)));
+  pin.setFocusHandler((focused) =>
+    scope.dispatchEvent(new PinFocusEvent(id, focused))
+  );
+  pin.setHoverHandler((hovered) =>
+    scope.dispatchEvent(new PinHoverEvent(id, hovered))
+  );
+
+  return pin;
+}
+
+/**
+ * @memberof CobaltAce
+ * @param {PinClickEvent} e
+ * @param {Object} e.detail
+ * @param {?string} e.detail.id The id for the result card element associated with the clicked pin
+ * @param {?MapPin} e.detail.pin The clicked pin
+ * @param {?Object} e.detail.selections
+ * @param {?HTMLElement} e.detail.selections.card The currently selected result card
+ * @param {?MapPin} e.detail.selections.pin The currently selected pin
+ */
+function pinClickHandler(e) {
+  const selections = e.detail.selections || {};
+
+  if (selections.pin &amp;&amp; selections.pin != e.detail.pin) {
+    selections.pin.setStatus({ selected: false });
+  }
+
+  if (e.detail.pin) {
+    e.detail.pin.setStatus({ selected: true });
+    selections.pin = e.detail.pin;
+  }
+
+  const resultCard = document.getElementById(e.detail.id);
+
+  if (selections.card &amp;&amp; selections.card != resultCard) {
+    selections.card.classList.remove('is-selected');
+  }
+
+  if (resultCard) {
+    resultCard.classList.add('is-selected');
+    scrollToResult(resultCard);
+  }
+
+  selections.card = resultCard;
+}
+
+/**
+ * @memberof CobaltAce
+ * @param {PinClickEvent} e
+ * @param {Object} e.detail
+ * @param {?string} e.detail.id The id for the result card element associated with the clicked pin
+ * @param {?MapPin} e.detail.pin The clicked pin
+ * @param {?Object} e.detail.selections
+ * @param {?HTMLElement} e.detail.selections.card The currently selected result card
+ * @param {?MapPin} e.detail.selections.pin The currently selected pin
+ */
+function cardClickHandler(e) {
+  const pin = e.detail.pin;
+  if (pin) {
+    const map = pin.getMap();
+    const pinCoord = pin.getCoordinate();
+
+    // only pan if the pin isn't already visible on the map
+    if (map &amp;&amp; pinCoord &amp;&amp; !map.getBounds().contains(pinCoord)) {
+      map.setCenter(pinCoord, true);
+    }
+  }
+
+  pinClickHandler(e);
+}
+
+/**
+ * @memberof CobaltAce
+ * @param {PinFocusEvent} e
+ * @param {Object} e.detail
+ * @param {boolean} e.detail.focused true if the pin is gaining focus, false if losing focus
+ * @param {?string} e.detail.id The id for the result card element associated with the focused pin
+ * @param {?MapPin} e.detail.pin The focused pin
+ */
+function pinFocusHandler(e) {
+  if (e.detail.pin) {
+    e.detail.pin.setStatus({ focused: e.detail.focused });
+  }
+
+  const resultCard = document.getElementById(e.detail.id);
+
+  if (resultCard) {
+    resultCard.classList[e.detail.focused ? 'add' : 'remove']('is-focused');
+  }
+}
+
+/**
+ * @memberof CobaltAce
+ * @param {PinHoverEvent} e
+ * @param {Object} e.detail
+ * @param {boolean} e.detail.hovered true if the pin has become hovered, false if it has become unhovered
+ * @param {?string} e.detail.id The id for the result card element associated with the hovered pin
+ * @param {?MapPin} e.detail.pin The hovered pin
+ */
+function pinHoverHandler(e) {
+  if (e.detail.pin) {
+    e.detail.pin.setStatus({ hovered: e.detail.hovered });
+  }
+
+  const resultCard = document.getElementById(e.detail.id);
+
+  if (resultCard) {
+    resultCard.classList[e.detail.hovered ? 'add' : 'remove']('is-hovered');
+  }
+}
+
+/**
+ * Handler for map move events that determines whether to show the re-search button
+ * @memberof CobaltAce
+ * @param {MapMoveEvent} e
+ * @param {Object} e.detail
+ * @param {?GeoBounds} e.detail.previousBounds
+ * @param {?GeoBounds} e.detail.currentBounds
+ * @param {HTMLElement} reSearchButton The re-search button
+ * @param {number} [distanceThreshold=5] The distance in miles the map has to move before the button is shown
+ */
+function reSearchController(e, reSearchButton, distanceThreshold = 5) {
+  if (
+    (reSearchButton.origin || e.detail.previousBounds) &amp;&amp;
+    e.detail.currentBounds
+  ) {
+    reSearchButton.origin =
+      reSearchButton.origin || e.detail.previousBounds.getCenter();
+    const currentCenter = e.detail.currentBounds.getCenter();
+
+    if (reSearchButton.origin.distanceTo(currentCenter) >= distanceThreshold) {
+      reSearchButton.classList.remove('is-hidden');
+    }
+  }
+}
+
+/**
+ * Scroll the result list to show the given element
+ * @memberof CobaltAce
+ * @inner
+ * @param {HTMLElement} targetEl The result card to scroll to
+ */
+function scrollToResult(targetEl) {
+  const isIE11 = !!(window.MSInputMethodContext &amp;&amp; document.documentMode);
+  const stickyHeight = isIE11
+    ? 0
+    : document.querySelector('.Locator-searchWrapper').offsetHeight;
+
+  const header = document.querySelector('header');
+  const headerHeight = header ? header.offsetHeight : 0;
+
+  const container = document.querySelector('.Locator-content');
+  const elTop = targetEl.offsetTop - container.scrollTop;
+  const elBottom = elTop + targetEl.offsetHeight;
+  const isScrolledIntoView =
+    elTop >= stickyHeight &amp;&amp; elBottom &lt;= container.offsetHeight - headerHeight;
+
+  if (!isScrolledIntoView) {
+    smoothScroll(container, elTop - stickyHeight, 400);
+  }
+}
+
+export {
+  pinPropertiesForStatus,
+  buildPin,
+  pinClickHandler,
+  pinFocusHandler,
+  pinHoverHandler,
+  cardClickHandler,
+  reSearchController
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="CobaltAce.html">CobaltAce</a></li><li><a href="CobaltChaz.html">CobaltChaz</a></li><li><a href="CobaltDill.html">CobaltDill</a></li></ul><h3>Classes</h3><ul><li><a href="-_anonymous_-goog.dom.DomHelper.html">DomHelper</a></li><li><a href="-_anonymous_-goog.i18n.BidiFormatter.html">BidiFormatter</a></li><li><a href="-_anonymous_-goog.inherits-tempCtor.html">tempCtor</a></li><li><a href="-_anonymous_-goog.soy.data.SanitizedContent.html">SanitizedContent</a></li><li><a href="-_anonymous_-goog.string.StringBuffer.html">StringBuffer</a></li><li><a href="-_anonymous_-soy.$$augmentMap-TempCtor.html">TempCtor</a></li><li><a href="-_anonymous_-soy.StringBuilder.html">StringBuilder</a></li><li><a href="-_anonymous_-soydata.$$makeSanitizedContentFactory_-InstantiableCtor.html">InstantiableCtor</a></li><li><a href="-_anonymous_-soydata.SanitizedCss.html">SanitizedCss</a></li><li><a href="-_anonymous_-soydata.SanitizedHtml.html">SanitizedHtml</a></li><li><a href="-_anonymous_-soydata.SanitizedHtmlAttribute.html">SanitizedHtmlAttribute</a></li><li><a href="-_anonymous_-soydata.SanitizedJs.html">SanitizedJs</a></li><li><a href="-_anonymous_-soydata.SanitizedJsStrChars.html">SanitizedJsStrChars</a></li><li><a href="-_anonymous_-soydata.SanitizedUri.html">SanitizedUri</a></li><li><a href="-_anonymous_-soydata.UnsanitizedText.html">UnsanitizedText</a></li><li><a href="CardClickEvent.html">CardClickEvent</a></li><li><a href="CardFocusEvent.html">CardFocusEvent</a></li><li><a href="CardHoverEvent.html">CardHoverEvent</a></li><li><a href="LocatorEvent.html">LocatorEvent</a></li><li><a href="MapMoveEvent.html">MapMoveEvent</a></li><li><a href="PinClickEvent.html">PinClickEvent</a></li><li><a href="PinFocusEvent.html">PinFocusEvent</a></li><li><a href="PinHoverEvent.html">PinHoverEvent</a></li></ul><h3>Global</h3><ul><li><a href="global.html#__webpack_public_path__">__webpack_public_path__</a></li><li><a href="global.html#IE">IE</a></li><li><a href="global.html#OPERA">OPERA</a></li><li><a href="global.html#sortListByKeys">sortListByKeys</a></li><li><a href="global.html#WEBKIT">WEBKIT</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sun Jul 04 2021 12:11:33 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

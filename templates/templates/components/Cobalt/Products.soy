@@ -1,0 +1,203 @@
+{namespace cobalt.products}
+
+// ---
+// products.ace_default is a specific configuration of products.ace_adapter
+//  which assumes the object being passed in is a standard ProductSection CFT
+//  and does the mappings automatically
+// ---
+
+/**
+ * Entity params
+ * @param productSection // Expects a standard ProductSection CFT
+ *
+ * Configuration params
+ * @param? centerContent When fewer than max results, center the results. Default is to make them wider
+ * @param? hideSchema
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? maxProducts
+ * @param? modifier
+ * @param? productSchemaType Could be 'Product' or 'Service' depending on content
+ * @param? yaTrackName
+ */
+ {template .ace_default}
+  {call .ace_adapter data="all"}
+    {param productListObject: $productSection /}
+    {param productsKey: 'productList' /}
+    {param titleKey: 'title' /}
+    {param ctaKey: 'cta' /}
+    {param productTitleKey: 'title' /}
+    {param productDescriptionKey: 'description' /}
+    {param productImageKey: 'image' /}
+    {param productCtaKey: 'cta' /}
+    {param productPriceKey: 'price' /}
+  {/call}
+ {/template}
+
+// ---
+// products.ace_adapter allows the user to map an arbitrary object to a Product
+//  template by defining which object fields map to each part of the Product.
+//
+// products.ace_adapter takes params [...]Key and [...]String for products,
+//  title, and cta. If [...]Key is truthy, it will attempt to access that
+//  field on $productObject. Else, it will use [...]String for that value.
+//  If [...]String == '', product.ace will not render elements controlled
+//  by that param under any circumstances. Note that passing a falsey value
+//  to products.ace will cause it to not render elements controlled by
+//  that param. if $productList is falsey, the entire component will not render.
+// ---
+
+/**
+ * @param productListObject
+ * @param productsKey
+ * @param titleKey
+ * @param ctaKey
+
+ * @param? productsObject
+ * @param? titleString
+ * @param? ctaTextString
+ * @param? ctaUrlString
+ *
+ * -- Passthrough --
+ * Configuration params
+ * @param? centerContent When fewer than max results, center the results. Default is to make them wider
+ * @param? hideSchema
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? maxProducts
+ * @param? modifier
+ * @param? productSchemaType Could be 'Product' or 'Service' depending on content
+ * @param? yaTrackName
+ *
+ * @param productTitleKey
+ * @param productDescriptionKey
+ * @param productImageKey
+ * @param productCtaKey
+ * @param productPriceKey
+
+ * @param? productTitleString
+ * @param? productDescriptionString
+ * @param? productImageUrlString
+ * @param? productImageAltString
+ * @param? productCtaTextString
+ * @param? productCtaUrlString
+ * @param? productPriceString
+ */
+{template .ace_adapter}
+  {let $products: $productsKey ? $productListObject[$productsKey] : $productsObject /}
+  {let $title: $titleString == '' ? false :
+    ($titleKey ? $productListObject[$titleKey] : $titleString) /}
+  {let $cta: $ctaKey ? $productListObject[$ctaKey] : false /}
+  {let $ctaText: $ctaTextString == '' ? false :
+    ($cta ? $cta.text : $ctaTextString) /}
+  {let $ctaUrl: $ctaUrlString == '' ? false :
+    ($cta ? $cta.url : $ctaUrlString) /}
+
+  {call .ace data="all"}
+    {param products: $products /}
+    {param title: $title /}
+    {param ctaText: $ctaText /}
+    {param ctaUrl: $ctaUrl /}
+    {param productTitleKey: $productTitleKey /}
+    {param productTitleString: $productTitleString /}
+    {param productDescriptionKey: $productDescriptionKey /}
+    {param productDescriptionString: $productDescriptionString /}
+    {param productImageKey: $productImageKey /}
+    {param productImageUrlString: $productImageUrlString /}
+    {param productImageAltString: $productImageAltString /}
+    {param productCtaKey: $productCtaKey /}
+    {param productCtaTextString: $productCtaTextString /}
+    {param productCtaUrlString: $productCtaUrlString /}
+    {param productPriceKey: $productPriceKey /}
+    {param productPriceString: $productPriceString /}
+  {/call}
+{/template}
+
+
+/**
+ * @param products  // List
+ * @param title     // pass empty string to not render
+ * @param ctaText   // cta Text and Url must not be empty to render
+ * @param ctaUrl    //  ^
+ *
+ * Configuration params
+ * @param? centerContent When fewer than max results, center the results. Default is to make them wider
+ * @param? hideSchema
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? maxProducts
+ * @param? modifier
+ * @param? productYaTrackName
+ * @param? productSchemaType Could be 'Product' or 'Service' depending on content
+ * @param? yaTrackName
+ *
+ * -- Passthrough --
+ * @param productTitleKey
+ * @param productDescriptionKey
+ * @param productImageKey
+ * @param productCtaKey
+ * @param productPriceKey
+
+ * @param? productTitleString
+ * @param? productDescriptionString
+ * @param? productImageUrlString
+ * @param? productImageAltString
+ * @param? productCtaTextKey
+ * @param? productCtaTextString
+ * @param? productCtaUrlKey
+ * @param? productCtaUrlString
+ * @param? productPriceString
+ */
+{template .ace}
+  {if $products and length($products ?: []) > 0}
+    <{$htmlTag ?: 'div'} class="Products Products--ace{if $modifier} {$modifier}{/if}">
+      <div class="Products-row">
+        {if $title}
+          <h{$hLevel ? $hLevel : '2'} class="Products-title">
+            {$title |noAutoescape}
+          </h{$hLevel ? $hLevel : '2'}>
+        {/if}
+      </div>
+      <ul class="Products-list Products-row {if $centerContent}Products-row--center{else}Products-row--widen{/if}">
+        {foreach $product in $products}
+          {if index($product) < ($maxProducts ?: 3)}
+            <li class="Products-listItem"{if not $hideSchema} itemprop="makesOffer" itemscope itemtype="http://schema.org/Offer"{/if}>
+              {call cobalt.product.ace_adapter}
+                {param productObject: $product /}
+                {param titleKey: $productTitleKey /}
+                {param titleString: $productTitleString /}
+                {param descriptionKey: $productDescriptionKey /}
+                {param descriptionString: $productDescriptionString /}
+                {param imageKey: $productImageKey /}
+                {param imageUrlString: $productImageUrlString /}
+                {param imageAltString: $productImageAltString /}
+                {param ctaKey: $productCtaKey /}
+                {param ctaTextKey: $productCtaTextKey /}
+                {param ctaTextString: $productCtaTextString /}
+                {param ctaUrlKey: $productCtaUrlKey /}
+                {param ctaUrlString: $productCtaUrlString /}
+                {param priceKey: $productPriceKey /}
+                {param priceString: $productPriceString /}
+                {param yaTrackName: $productYaTrackName ?: '' /}
+                {param schemaType: $productSchemaType ? $productSchemaType : 'Offer' /}
+                {param hideSchema: $hideSchema /}
+                {param hLevel: $hLevel ? $hLevel + 1 : 3 /}
+              {/call}
+            </li>
+          {/if}
+        {/foreach}
+      </ul>
+      {if $ctaText and $ctaUrl}
+        <div class="Products-row">
+          <div class="Products-linkWrapper">
+            <a class="Products-link"
+              href="{$ctaUrl}"
+              data-ya-track="{$yaTrackName ?: 'products'}">
+              {$ctaText |noAutoescape}
+            </a>
+          </div>
+        </div>
+      {/if}
+    </{$htmlTag ?: 'div'}>
+  {/if}
+{/template}

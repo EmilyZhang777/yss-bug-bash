@@ -1,0 +1,141 @@
+{namespace cobalt.faq}
+
+// Expects a list of maps for FAQs parameter with two keys. By default,
+// these key names are 'question' and 'answer'. Optional configuration
+// params allow you to set key names of your own
+
+/**
+ * Content params
+ * @param? title
+ * @param FAQs
+ * @param? titleIcon
+ *
+ * Passthrough params
+ * @param? maxFAQs
+ * @param? faqQuestionKey
+ * @param? faqAnswerKey
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? extraClasses
+ * @param? yaScopeName
+ * @param? yaTrackName
+ * @param? hideSchema
+ * @param? isRichText
+ */
+
+{template .ace}
+  {if length($FAQs ?: [])}
+    <{$htmlTag ?: 'div'} class="FAQ FAQ--ace{if $modifier} FAQ--{$modifier}{/if}{if $extraClasses} {$extraClasses}{/if}" data-ya-scope="{$yaScopeName ?: 'faq'}"{if not $hideSchema} itemscope itemtype="http://schema.org/FAQPage"{/if}>
+      {if $title}
+        <div class="FAQ-row">
+          <h{$hLevel ?: '2'} class="FAQ-title">
+            {$title |noAutoescape}
+          </h{$hLevel ?: '2'}>
+        </div>
+      {/if}
+      <ul class="FAQ-list FAQ-row">
+        {foreach $FAQ in $FAQs}
+          {if not isNonnull($maxFAQs) or index($FAQ) < $maxFAQs}
+            {call .item data="all"}
+              {param FAQ: $FAQ /}
+              {param index: index($FAQ) /}
+            {/call}
+          {/if}
+        {/foreach}
+      </ul>
+    </{$htmlTag ?: 'div'}>
+  {/if}
+{/template}
+
+/**
+ * @param FAQ
+ * @param index
+ * @param? modifier
+ * @param? faqQuestionKey
+ * @param? faqAnswerKey
+ * @param? titleIcon
+ * @param? hideSchema
+ * @param? isRichText
+ * @param? yaTrackName
+ */
+
+{template .item}
+  {let $title: $faqQuestionKey ? $FAQ[$faqQuestionKey] : ($FAQ.question ?: '') /}
+  {let $description: $faqAnswerKey ? $FAQ[$faqAnswerKey] : ($FAQ.answer ?: '') /}
+
+  {if $title and $description}
+    {let $ariaControlId: $modifier ? 'faq-answer-' + $index + '-' + $modifier : 'faq-answer-' + $index  /}
+
+    <li class="FAQ-listItem js-faq-list-item"{if not $hideSchema} itemprop="mainEntity" itemscope itemtype="http://schema.org/Question"{/if}>
+      <button class="FAQ-question FAQ-button js-faq-toggle" aria-controls="{$ariaControlId}" aria-expanded="false" data-ya-track="{$yaTrackName ?: 'toggle#'}">
+        <span class="FAQ-questionTextRow">
+          <span class="FAQ-questionText"{if not $hideSchema} itemprop="name"{/if}>
+            {$title |noAutoescape}
+          </span>
+          {if $titleIcon}
+            {$titleIcon |noAutoescape}
+          {else}
+            <span class="sr-only">
+              {call strings.faq_screenReaderText /}
+            </span>
+            <span class="FAQ-toggleIcon"></span>
+          {/if}
+        </span>
+      </button>
+      <div id="{$ariaControlId}" class="FAQ-answer js-faq-answer" aria-hidden="true"{if not $hideSchema} itemprop="acceptedAnswer" itemscope itemtype="http://schema.org/Answer"{/if}>
+        <div class="FAQ-answerText"{if not $hideSchema} itemprop="text"{/if}>
+          {if $isRichText}
+            {$description |convertRTFToHTML}
+          {else}
+            {$description |noAutoescape}
+          {/if}
+        </div>
+      </div>
+    </li>
+  {/if}
+{/template}
+
+
+// Takes two string lists of EQUAL lengths and adapts them
+// to .ace
+
+/**
+ * Content params
+ * @param? title
+ * @param questionList
+ * @param answerList
+ * @param? titleIcon
+ *
+ * Passthrough params
+ * @param? maxFAQs
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? extraClasses
+ * @param? yaScopeName
+ * @param? hideSchema
+ * @param? isRichText
+ */
+
+{template .ace_adapter}
+  {if length($questionList) == length($answerList) and
+      length($questionList)}
+
+    {for $i in range(length($questionList))}
+      {let $FAQs: augmentList($FAQs ?: [], [[
+        'question': $questionList[$i],
+        'answer': $answerList[$i]
+      ]]) /}
+      {if isLast($i)}
+        {call .ace data="all"}
+          {param FAQs: $FAQs /}
+        {/call}
+      {/if}
+    {/for}
+  {/if}
+{/template}

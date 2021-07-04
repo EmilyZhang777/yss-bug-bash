@@ -1,0 +1,68 @@
+{namespace static}
+
+/**
+ * @param isHttps
+ * @param isStaging
+ * @param locale
+ * @param siteDomain
+ * @param siteId
+ * @param siteInternalHostName
+ * @param soyTemplateName
+ */
+{template .four_oh_four}
+  {let $baseUrl: $isStaging ? '/' : '//' + $siteDomain + '/' /}
+
+  // Simply remove this value if a redirect away from the 404 page isn't desired.
+  {let $destinationUrl}
+    {call url.root data="all" /}
+  {/let}
+
+  {let $pixelUrl}
+    {if $isStaging}
+      {call secrets.Yext404PixelStaging /}
+    {else}
+      {call secrets.Yext404PixelProd /}
+    {/if}
+  {/let}
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      {call common.helpers.set_baseUrl}
+        {param baseUrl: $baseUrl /}
+      {/call}
+      {call common.helpers.set_locale data="all" /}
+      {call components.Monitoring.Init data="all" /}
+
+      {call components.Util.DataForJs_global}
+        {param var: 'yxtLostAndFoundConfig' /}
+        {param content: [
+          'destinationUrl': $destinationUrl,
+          'isStaging': $isStaging,
+          'pixelUrl': $pixelUrl,
+          'siteDomain': $siteDomain,
+          'siteId': $siteId
+        ] /}
+      {/call}
+
+      <title>404 - Page not found</title>
+
+      {call common.include.four_oh_four_assets data="all"}
+        {param baseUrl: $baseUrl /}
+      {/call}
+
+      <noscript>
+        <meta http-equiv="refresh" content="3;URL={$destinationUrl}">
+      </noscript>
+    </head>
+    <body>
+      <p>
+        Sorry, we could not find the URL you were looking for.
+      </p>
+      <p>
+        If you are not automatically redirected to our homepage,<br>
+        <a href="{$destinationUrl}">please click here</a>.
+      </p>
+    </body>
+  </html>
+{/template}

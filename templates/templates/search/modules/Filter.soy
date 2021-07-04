@@ -1,0 +1,80 @@
+{namespace search}
+
+/**
+ * Filter
+ * @param locale
+ * @param choices MULTI_OPTION/SINGLE_OPTION choices
+ * @param name Custom Field Name
+ * @param paramName Query Param used
+ * @param queryParams
+ * @param type MULTI_OPTION, SINGLE_OPTION, etc
+ */
+{template .Filter}
+  {let $selectedParams: $queryParams?[$paramName] ?: [] /}
+  {let $filterChoices: $choices ?: [] /}
+  {let $inputType}
+    {switch $type}
+      {case 'MULTI_OPTION'}
+        checkbox
+      {case 'SINGLE_OPTION'}
+        radio
+      {case 'SINGLE_OPTION_SELECT'}
+        select
+      {case 'BOOLEAN'}
+        checkbox
+    {/switch}
+  {/let}
+  {let $filterKeys:
+    $type == 'BOOLEAN' ?
+      [$name]
+    : $type == 'SINGLE_OPTION_SELECT' ?
+      $filterChoices
+    : sortListByKeys($filterChoices, ['displayName'])
+  /}
+
+  {if length($filterKeys ?: [])}
+    {if $inputType == 'select'}
+      <label class="Filter Filter-selectWrapper">
+        <select class="Filter-{$inputType}" name="{$paramName}">
+    {/if}
+    {foreach $filter in $filterKeys}
+      // Cast $filterChoices[$filter] to a string to compare against queryParams
+      {let $filterValue: ($type == 'BOOLEAN' ? true : $filter.numericValue) + '' /}
+      {let $isChecked: contains($selectedParams, $filterValue) /}
+      {let $translatedDisplayName}
+        {foreach $translation in $filter.displayNameTranslation ?: []}
+          {if $translation.localeCode == $locale}
+            {$translation.value |noAutoescape}
+          {/if}
+        {/foreach}
+      {/let}
+      {let $displayName: $translatedDisplayName ? $translatedDisplayName : $filter.displayName /}
+
+      {if $inputType == 'select'}
+        <option value="{$filterValue}"
+                data-ya-track="{$filter.displayName |slugify}"
+                {if $isChecked} selected{/if}
+                >
+          {$displayName}
+        </option>
+      {else}
+        <label class="Filter">
+          <input type="{$inputType}"
+                 value="{$filterValue}"
+                 name="{$paramName}"
+                 class="Filter-{$inputType}"
+                 data-ya-track="{$filter.displayName |slugify}"
+                 {if $isChecked} checked{/if}
+                 >
+          <span class="Filter-text">
+            {$displayName}
+          </span>
+        </label>
+      {/if}
+    {/foreach}
+    {if $inputType == 'select'}
+        </select>
+      </label>
+    {/if}
+  {/if}
+{/template}

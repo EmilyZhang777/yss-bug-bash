@@ -1,0 +1,622 @@
+{namespace cobalt.core}
+
+/**
+ * @param locale
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param relatedData
+ *
+ * Content params
+ * @param? col1Heading
+ * @param? col2Heading
+ * @param? ctaText
+ * @param? ctaURL
+ * @param? mapID
+ * @param? phoneTypes
+ * @param? phoneLabelMap
+ * @param? phoneYaTrackMap
+ * @param? uberButtonText
+ *
+ * Configuration params
+ * @param? hideSchema
+ * @param? hideUber
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? linkToGetDirections
+ * @param? modifier
+ * @param? yaScopeName
+ * @param? yaTrackName
+ *
+ * Hours params
+ * @param? highlightToday boolean
+ * @param? highlightTodayBackground boolean
+ * @param? showOpenToday
+ * @param? open24HoursMessage
+ * @param? openTodayMessage
+ * @param? dayOfWeekMap
+ * @param? twentyFourHourClock
+ * @param? collapseDays
+ * @param? wholeWeekMessage
+ * @param? disableOpenUntil
+ * @param? disableTodayFirst
+ *
+ * Map Params
+ * @param? mapProvider For Static Map
+ * @param? mapApiKey For Static Map
+ *
+ * Content overrides
+ * @param? row1
+ * @param? col1
+ * @param? col2
+ * @param? col3
+ */
+{template .ace}
+
+  <{$htmlTag ?: 'div'} class="Core Core--ace{if $modifier} {$modifier}{/if} js-core" data-ya-scope="{$yaScopeName ? $yaScopeName : 'core'}">
+    {call .ace_layout}
+      {param row1}
+        {if isNonnull($row1)}
+          {$row1 |noAutoescape}
+        {else}
+          <div class="Core-row1">
+            <h{$hLevel ?: '1'} class="Core-title">
+              {call common.modules.LocationName data="all" /}
+            </h{$hLevel ?: '1'}>
+            {if length($profile.hours?.normalHours ?: [])}
+              <div class="Core-hoursToday">
+                {call components.Hours.HoursToday data="all"}
+                  {param hours: $profile.hours.normalHours /}
+                {/call}
+              </div>
+            {/if}
+          </div>
+        {/if}
+      {/param}
+      {param col1}
+        {if $col1}
+          {$col1 |noAutoescape}
+        {else}
+          <div class="Core-colHeading">
+            {if $col1Heading}
+              {$col1Heading |noAutoescape}
+            {else}
+              {call strings.core_col1Heading /}
+            {/if}
+          </div>
+
+          <div class="Core-address">
+            {call components.Address.Address data="all"}
+              {param regionAbbr: true /}
+              {param itemRefId: 'address' /}
+            {/call}
+          </div>
+
+          {let $phonesToInclude: $phoneTypes ? $phoneTypes : ['main'] /}
+          {let $profilePhoneCounter}
+            {call components.Phone.ProfilePhoneCounter data="all"}
+              {param phoneTypes: $phonesToInclude /}
+            {/call}
+          {/let}
+          {let $numProfilePhones: parseInt($profilePhoneCounter) /}
+          {if $numProfilePhones > 0}
+            {let $onePhone: $numProfilePhones == 1 /}
+            <div class="Core-phones{if $onePhone} Core-phones--single{/if}">
+              {call components.Phone.Phones data="all"}
+                {param phoneTypes: $phonesToInclude /}
+              {/call}
+            </div>
+          {/if}
+
+          {if length($profile.emails ?: []) > 0}
+            <a class="Core-email" {call common.helpers.obfuscate_mailto}{param email: $profile.emails[0] /}{/call}>
+              {$profile.emails[0]}
+            </a>
+          {/if}
+
+          <div class="Core-buttons">
+            <div class="Core-button Core-directions">
+              {call components.Maps.GetDirections data="all" /}
+            </div>
+            {if $ctaURL and $ctaText}
+              <a class="Core-button Core-cta" href="{$ctaURL}"{if $yaTrackName} data-ya-track="{$yaTrackName}"{/if}>
+                {$ctaText |noAutoescape}
+              </a>
+            {/if}
+            {if not $hideUber}
+              {call components.Uber.Uber data="all"}
+                {param uberIconBefore: true /}
+                {param modifier: 'Core-button Core-uber' /}
+                {param linkText}
+                  {if $uberButtonText}
+                    {$uberButtonText |noAutoescape}
+                  {else}
+                    {call strings.uberCTAText /}
+                  {/if}
+                {/param}
+                {param defaultClientId}
+                  {call secrets.YextUberClientId /}
+                {/param}
+              {/call}
+            {/if}
+          </div>
+        {/if}
+      {/param}
+      {param col2}
+        {if $col2}
+          {$col2 |noAutoescape}
+        {else}
+          {if length($profile.hours?.normalHours ?: [])}
+            <div class="Core-colHeading">
+              {if $col2Heading}
+                {$col2Heading |noAutoescape}
+              {else}
+                {call strings.core_col2Heading /}
+              {/if}
+            </div>
+
+            <div class="Core-hours">
+              {call components.Hours.Hours data="all"}
+                {param hours: $profile.hours.normalHours /}
+                {param additionalHoursText: $profile.additionalHoursText /}
+                {param hLevel: null /}
+              {/call}
+            </div>
+          {/if}
+        {/if}
+      {/param}
+      {param col3}
+        {if $col3}
+          {$col3 |noAutoescape}
+        {elseif $mapProvider and isNonnull($mapApiKey)}
+          {call components.LocationMap.LocationMap data="all"}
+            {param itemRefs: 'address location-name' /}
+            {param provider: $mapProvider /}
+            {param providerApiKey: $mapApiKey /}
+          {/call}
+        {/if}
+      {/param}
+    {/call}
+  </{$htmlTag ?: 'div'}>
+{/template}
+
+/**
+ * @param locale
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param relatedData
+ *
+ * Content params
+ * @param? col1Heading
+ * @param? col2Heading
+ * @param? mapID
+ * @param? phoneTypes
+ * @param? phoneLabelMap
+ * @param? phoneYaTrackMap
+ * @param? uberButtonText
+ *
+ * Configuration params
+ * @param? hideSchema
+ * @param? hideUber
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? linkToGetDirections
+ * @param? modifier
+ * @param? yaScopeName
+ * @param? yaTrackName
+ *
+ * Hours params
+ * @param? highlightToday boolean
+ * @param? highlightTodayBackground boolean
+ * @param? showOpenToday
+ * @param? open24HoursMessage
+ * @param? openTodayMessage
+ * @param? dayOfWeekMap
+ * @param? twentyFourHourClock
+ * @param? collapseDays
+ * @param? wholeWeekMessage
+ * @param? disableOpenUntil
+ * @param? disableTodayFirst
+ *
+ * Map Params
+ * @param? mapProvider For Static Map
+ * @param? mapApiKey For Static Map
+ *
+ * Content Overrides
+ * @param? row1
+ * @param? col1
+ * @param? col2
+ * @param? col3
+ */
+{template .ace_default}
+  {call .ace data="all"}
+    {param ctaURL: $profile.c_coreCTAUrl /}
+    {param ctaText: $profile.c_coreCTAText /}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param relatedData
+ *
+ * Content params
+ * @param? col1Heading
+ * @param? col2Heading
+ * @param? ctaMap
+ * @param? hours2
+ * @param? hours2AdditionalText
+ * @param? mapID
+ * @param? phoneTypes
+ * @param? phoneLabelMap
+ * @param? phoneYaTrackMap
+ *
+ * Configuration params
+ * @param? hideSchema
+ * @param? htmlTag
+ * @param? linkToGetDirections
+ * @param? modifier
+ * @param? yaScopeName
+ *
+ * Hours params
+ * @param? highlightToday boolean
+ * @param? highlightTodayBackground boolean
+ * @param? showOpenToday
+ * @param? open24HoursMessage
+ * @param? openTodayMessage
+ * @param? hideSchema
+ * @param? dayOfWeekMap
+ * @param? twentyFourHourClock
+ * @param? collapseDays
+ * @param? wholeWeekMessage
+ * @param? disableOpenUntil
+ * @param? disableTodayFirst
+ * @param? openUntilMessage
+ *
+ * Map Params
+ * @param? mapProvider For Static Map
+ * @param? mapApiKey For Static Map
+ *
+ * Content overrides
+ * @param? col1
+ * @param? col2
+ * @param? col3
+ */
+{template .bev}
+  <{$htmlTag ?: 'div'} class="Core Core--bev{if $modifier} {$modifier}{/if} js-core" data-ya-scope="{$yaScopeName ? $yaScopeName : 'Core'}">
+    {call .ace_layout}
+      {param row1: false /}
+      {param col1}
+        {if $col1}
+          {$col1 |noAutoescape}
+        {else}
+          <div class="Core-colHeading">
+            {if $col1Heading}
+              {$col1Heading |noAutoescape}
+            {else}
+              {call strings.core_col1Heading /}
+            {/if}
+          </div>
+
+          <div class="Core-address">
+            {call components.Address.Address data="all"}
+              {param regionAbbr: true /}
+              {param itemRefId: 'address' /}
+            {/call}
+          </div>
+
+          {let $phonesToInclude: $phoneTypes ? $phoneTypes : ['main'] /}
+          {let $profilePhoneCounter}
+            {call components.Phone.ProfilePhoneCounter data="all"}
+              {param phoneTypes: $phonesToInclude /}
+            {/call}
+          {/let}
+          {let $numProfilePhones: parseInt($profilePhoneCounter) /}
+          {if $numProfilePhones > 0}
+            {let $onePhone: $numProfilePhones == 1 /}
+            <div class="Core-phones{if $onePhone} Core-phones--single{/if}">
+              {call components.Phone.Phones data="all"}
+                {param phoneTypes: $phonesToInclude /}
+              {/call}
+            </div>
+          {/if}
+
+          {if length($profile.emails ?: []) > 0}
+            <a class="Core-email" {call common.helpers.obfuscate_mailto}{param email: $profile.emails[0] /}{/call}>
+              {call strings.emailCTA /}
+            </a>
+          {/if}
+
+          {if length(keys($ctaMap))}
+            <div class="Core-buttons">
+              {foreach $cta in $ctaMap}
+                {if $cta.text and $cta.url}
+                  <a class="Core-button Core-cta" href="{$cta.url}"{if $cta.yaTrackName} data-ya-track="{$cta.yaTrackName}"{/if}>
+                    {$cta.text |noAutoescape}
+                  </a>
+                {/if}
+              {/foreach}
+            </div>
+          {/if}
+        {/if}
+      {/param}
+      {param col2}
+        {if $col2}
+          {$col2 |noAutoescape}
+        {else}
+          {if length($profile.hours?.normalHours ?: [])}
+            <div class="Core-subCol">
+              <div class="Core-colHeading">
+                {if $col2Heading}
+                  {$col2Heading |noAutoescape}
+                {else}
+                  {call strings.core_col2Heading /}
+                {/if}
+              </div>
+
+              <div class="Core-hours">
+                {call components.Hours.HoursCollapse data="all"}
+                  {param hours: $profile.hours.normalHours /}
+                  {param additionalHoursText: $profile.additionalHoursText /}
+                  {param addCollapsed: not $hours2 /}
+                  {param id: 'c-hours-collapse--1' /}
+                  {param openUntilMessage}
+                    {if $openUntilMessage}
+                      {$openUntilMessage |noAutoescape}
+                    {else}
+                      {call strings.hours_statusOpen /}
+                      {sp}-{sp}
+                      {call strings.hours_closesAt /}
+                      {sp}
+                    {/if}
+                  {/param}
+                  {param highlightToday: $highlightToday ?: true /}
+                {/call}
+              </div>
+            </div>
+          {/if}
+
+          {if length($hours2?.normalHours ?: [])}
+            <div class="Core-subCol">
+              <div class="Core-colHeading">
+                {if $col2Heading}
+                  {$col2Heading |noAutoescape}
+                {else}
+                  {call strings.core_col2Heading /}
+                {/if}
+              </div>
+
+              <div class="Core-hours Core-hours--2">
+                {call components.Hours.HoursCollapse data="all"}
+                  {param hours: $hours2.normalHours /}
+                  {param additionalHoursText: $hours2AdditionalText /}
+                  {param addCollapsed: true /}
+                  {param id: 'c-hours-collapse--2' /}
+                  {param openUntilMessage}
+                    {if $openUntilMessage}
+                      {$openUntilMessage |noAutoescape}
+                    {else}
+                      {call strings.hours_statusOpen /}
+                      {sp}-{sp}
+                      {call strings.hours_closesAt /}
+                      {sp}
+                    {/if}
+                  {/param}
+                  {param highlightToday: $highlightToday ?: true /}
+                {/call}
+              </div>
+            </div>
+          {/if}
+        {/if}
+      {/param}
+      {param col3}
+        {if $col3}
+          {$col3 |noAutoescape}
+        {elseif $mapProvider and isNonnull($mapApiKey)}
+          {call components.LocationMap.LocationMap data="all"}
+            {param itemRefs: 'address location-name' /}
+            {param provider: $mapProvider /}
+            {param providerApiKey: $mapApiKey /}
+          {/call}
+        {/if}
+      {/param}
+    {/call}
+  </{$htmlTag ?: 'div'}>
+{/template}
+
+/**
+ * @param locale
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param relatedData
+ *
+ * Content params
+ * @param? heading
+ * @param? role
+ * @param? addressHeading
+ * @param? contactHeading
+ * @param? ctaMap
+ * @param? id
+ * @param? idText
+ * @param? photo
+ * @param? photoAltText
+ *
+ * Configuration params
+ * @param? hideSchema
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? linkToGetDirections
+ * @param? modifier
+ * @param? yaScopeName
+ *
+ * Content Overrides
+ * @param? col1
+ * @param? col2
+ */
+{template .chaz}
+  <{$htmlTag ?: 'div'} class="Core Core--chaz{if $modifier} {$modifier}{/if}" data-ya-scope="{$yaScopeName ? $yaScopeName : 'Core'}">
+    <div class="Core-row">
+      <div class="Core-col1">
+        {if $col1}
+          {$col1 |noAutoescape}
+        {else}
+          <div class="Core-colRow">
+            {if $photo}
+              <div class="Core-photoWrapper">
+                <img class="Core-photo" src="{$photo}" alt="{$photoAltText ?: ''}"/>
+              </div>
+            {/if}
+
+            <div class="Core-subCol">
+              <h{$hLevel ?: '1'} class="Core-heading">
+                {$heading ? $heading : $profile.name |noAutoescape}
+              </h{$hLevel ?: '1'}>
+
+              {if $role}
+                <div class="Core-role">
+                  {$role} at {$profile.name}
+                </div>
+              {/if}
+
+              {if $id}
+                <div class="Core-id">
+                  {if $idText}
+                    {$idText |noAutoescape}
+                  {else}
+                    {call strings.core_idLabel /}
+                  {/if}
+                  : {$id}
+                </div>
+              {/if}
+
+              {if length(keys($ctaMap))}
+                <div class="Core-buttons">
+                  {foreach $cta in $ctaMap}
+                    {if $cta.text and $cta.url}
+                      <a class="Core-button Core-cta" href="{$cta.url}"{if $cta.yaTrackName} data-ya-track="{$cta.yaTrackName}"{/if}>
+                        {$cta.text |noAutoescape}
+                      </a>
+                    {/if}
+                  {/foreach}
+                </div>
+              {/if}
+            </div>
+          {/if}
+        </div>
+      </div>
+      <div class="Core-col2">
+        {if $col2}
+          {$col2 |noAutoescape}
+        {else}
+          <div class="Core-subCol">
+            <div class="Core-bioHeading">
+              {if $addressHeading}
+                {$addressHeading |noAutoescape}
+              {else}
+                {call strings.address_title /}
+              {/if}
+            </div>
+            <div class="Core-address">
+              {call components.Address.Address data="all"}
+                {param regionAbbr: true /}
+                {param itemRefId: 'address' /}
+              {/call}
+            </div>
+
+            <div class="Core-directions">
+              {call components.Maps.GetDirections data="all" /}
+            </div>
+          </div>
+          <div class="Core-subCol">
+            <div class="Core-bioHeading">
+              {if $contactHeading}
+                {$contactHeading |noAutoescape}
+              {else}
+                {call strings.contact_title /}
+              {/if}
+            </div>
+
+            {call .chaz_phones data="all" /}
+
+            {if length($profile.emails ?: []) > 0}
+              <a class="Core-email" {call common.helpers.obfuscate_mailto}{param email: $profile.emails[0] /}{/call}>
+                {call strings.emailCTA /}
+              </a>
+            {/if}
+          </div>
+
+        {/if}
+      </div>
+    </div>
+  </{$htmlTag ?: 'div'}>
+{/template}
+
+/**
+ * @param row1
+ * @param col1
+ * @param col2
+ * @param col3
+ */
+{template .ace_layout}
+  {if $row1}
+    <div class="Core-row">
+      <div class="Core-col--full">
+        {$row1 | noAutoescape}
+      </div>
+    </div>
+  {/if}
+  <div class="Core-row">
+    <div class="Core-col--secondary">
+      {$col1 | noAutoescape}
+    </div>
+    <div class="Core-col--secondary">
+      {$col2 | noAutoescape}
+    </div>
+    <div class="Core-col--secondary">
+      {$col3 | noAutoescape}
+    </div>
+  </div>
+{/template}
+
+/**
+ * @param profile
+ * @param? phoneLabelMap
+ * @param? phoneTypes
+ */
+{template .chaz_phones}
+  {let $mainPhoneLabel}
+    {call strings.core_mainPhoneLabel /}
+  {/let}
+  {let $mobilePhoneLabel}
+    {call strings.core_mobileLabel /}
+  {/let}
+  {let $faxLabel}
+    {call strings.core_faxLabel /}
+  {/let}
+  {let $phonesToInclude: $phoneTypes ? $phoneTypes : ['main', 'mobile', 'fax'] /}
+  {let $defaultLabelMap: ['main': $mainPhoneLabel, 'mobile': $mobilePhoneLabel, 'fax': $faxLabel] /}
+  {let $labelMap: $phoneLabelMap ?: $defaultLabelMap /}
+  {let $profilePhoneCounter}
+    {call components.Phone.ProfilePhoneCounter data="all"}
+      {param phoneTypes: $phonesToInclude /}
+    {/call}
+  {/let}
+  {let $numProfilePhones: parseInt($profilePhoneCounter) /}
+  {if $numProfilePhones > 0}
+    {let $onePhone: $numProfilePhones == 1 /}
+    <div class="Core-phones{if $onePhone} Core-phones--single{/if}">
+      {call components.Phone.Phones data="all"}
+        {param phoneTypes: $phonesToInclude /}
+        {param phoneLabelMap: $labelMap /}
+      {/call}
+    </div>
+  {/if}
+{/template}

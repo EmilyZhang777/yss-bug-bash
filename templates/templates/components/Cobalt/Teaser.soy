@@ -1,0 +1,565 @@
+{namespace cobalt.teaser}
+
+/**
+ * @param baseUrl
+ * @param locale
+ * @param url
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param? relatedData
+ * @param? distance
+ * @param? listings Used in place of relatedData.listings on locators
+ *
+ * Content params
+ * @param? ctaURL
+ * @param? ctaText
+ * @param? distance
+ * @param? prettyQuery
+ * @param? servicesLabel
+ * @param? servicesField
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? useKilometers
+ * @param? modifier Use to vary the Teaser based on where it's called
+ */
+{template .ace}
+  {let $hasDistance: isNonnull($distance?.distanceMiles) /}
+
+  <article class="Teaser Teaser--ace{if $modifier} Teaser--{$modifier}{/if}">
+    {call components.Util.HLevel}
+      {param contents}
+        {if $url}
+          <a class="Teaser-titleLink" href="{$baseUrl}{$url}" data-ya-track="businessname">
+            {call common.modules.LocationName data="all"}
+              {param hideSchema: true /}
+            {/call}
+          </a>
+        {else}
+          {call common.modules.LocationName data="all"}
+            {param hideSchema: true /}
+          {/call}
+        {/if}
+      {/param}
+      {param class: 'Teaser-title' /}
+      {param level: $hLevel ?: 3 /}
+    {/call}
+    {if length($profile.hours?.normalHours ?: []) > 0}
+      <div class="Teaser-open">
+        {call components.Hours.HoursToday data="all"}
+          {param hours: $profile.hours.normalHours /}
+          {param hideSchema: true /}
+        {/call}
+      </div>
+    {/if}
+    <div class="Teaser-address">
+      {call components.Address.Address data="all"}
+        {param regionAbbr: true /}
+        {param hideSchema: true /}
+      {/call}
+    </div>
+    {if $profile.mainPhone}
+      <div class="Teaser-phone">
+        {call components.Phone.Phone data="all"}
+          {param phone: $profile.mainPhone /}
+          {param phoneType: 'main' /}
+          {param label}
+            <span class="sr-only">
+              {call strings.phone_label /}
+            </span>
+          {/param}
+          {param hideSchema: true /}
+        {/call}
+      </div>
+    {/if}
+    {call .services data="all" /}
+    <div class="Teaser-linksRow">
+      {if $hasDistance}
+        <div class="Teaser-miles">
+          {call .distanceToQuery data="all" /}
+        </div>
+      {/if}
+      <div class="Teaser-links">
+        <div class="Teaser-link Teaser-directions">
+          {call components.Maps.GetDirections data="all" /}
+        </div>
+        {if $ctaURL or $url}
+          <div class="Teaser-link Teaser-cta">
+            {let $defaultCtaText}
+              {call strings.teaser_defaultCTAText /}
+            {/let}
+            <a data-ya-track="{if $ctaURL}cta{else}visitpage{/if}"
+               href="{$ctaURL ? $ctaURL : $baseUrl + $url}">
+              {$ctaText ? $ctaText : $defaultCtaText |noAutoescape}
+            </a>
+          </div>
+        {/if}
+      </div>
+    </div>
+  </article>
+{/template}
+
+
+/**
+ * @param baseUrl
+ * @param locale
+ * @param url
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param? relatedData
+ * @param? distance
+ * @param? listings Used in place of relatedData.listings on locators
+ *
+ * Content params
+ * @param? prettyQuery
+ * @param? servicesLabel
+ * @param? servicesField
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? useKilometers
+ * @param? modifier Use to vary the Teaser based on where it's called
+ */
+{template .ace_default}
+  {call .ace data="all"}
+    {param ctaURL: $profile.c_teaserCTA?.url /}
+    {param ctaText: $profile.c_teaserCTA?.linkText /}
+  {/call}
+{/template}
+
+
+/**
+ * @param baseUrl
+ * @param locale
+ * @param url
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param? relatedData
+ * @param? distance
+ * @param? listings Used in place of relatedData.listings on locators
+ *
+ * Content params
+ * @param? ctaText
+ * @param? ctaURL
+ * @param? prettyQuery
+ * @param? servicesLabel
+ * @param? servicesField
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? useKilometers
+ * @param? modifier Use to vary the Teaser based on where it's called
+ */
+{template .chaz}
+  {let $hasDistance: isNonnull($distance?.distanceMiles) /}
+  <article class="Teaser Teaser--chaz{if $modifier} Teaser--{$modifier}{/if}">
+    <div class="Teaser-titleWrapper">
+      {call components.Util.HLevel}
+        {param contents}
+          <a class="Teaser-titleLink" href="{$baseUrl}{$url}" data-ya-track="businessname">
+            {call common.modules.LocationName data="all"}
+              {param hideSchema: true /}
+            {/call}
+          </a>
+        {/param}
+        {param class: 'Teaser-title' /}
+        {param level: $hLevel ?: 3 /}
+      {/call}
+      {if $hasDistance}
+        <div class="Teaser-miles">
+          {call .distanceToQuery data="all" /}
+        </div>
+      {/if}
+    </div>
+    <div class="Teaser-content">
+      <div class="Teaser-column">
+        {if length($profile.hours?.normalHours ?: []) > 0}
+          <div class="Teaser-open">
+            {call components.Hours.HoursToday data="all"}
+              {param hours: $profile.hours.normalHours /}
+              {param hideSchema: true /}
+            {/call}
+          </div>
+        {/if}
+        {if $profile.mainPhone}
+          <div class="Teaser-phone">
+            {call components.Phone.Phone data="all"}
+              {param phone: $profile.mainPhone /}
+              {param phoneType: 'main' /}
+              {param label}
+                <span class="sr-only">
+                  {call strings.phone_label /}
+                </span>
+              {/param}
+              {param hideSchema: true /}
+            {/call}
+          </div>
+        {/if}
+        <div class="Teaser-address">
+          {call components.Address.Address data="all"}
+            {param regionAbbr: true /}
+            {param hideSchema: true /}
+          {/call}
+        </div>
+      </div>
+      <div class="Teaser-column">
+        {call .services data="all" /}
+        <div class="Teaser-linksRow">
+          <div class="Teaser-links">
+            <div class="Teaser-link Teaser-directions">
+              {call components.Maps.GetDirections data="all" /}
+            </div>
+            {if $ctaURL or $url}
+              <div class="Teaser-link Teaser-cta">
+                {let $defaultCtaText}
+                  {call strings.teaser_defaultCTAText /}
+                {/let}
+                <a data-ya-track="{if $ctaURL}cta{else}visitpage{/if}"
+                  href="{$ctaURL ? $ctaURL : $baseUrl + $url}">
+                  {$ctaText ? $ctaText : $defaultCtaText}
+                </a>
+              </div>
+            {/if}
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+{/template}
+
+
+/**
+ * @param baseUrl
+ * @param url
+ * @param locale
+ *
+ * Entity
+ * @param profile
+ * @param derivedData
+ * @param? relatedData
+ * @param? distance
+ * @param? listings Used in place of relatedData.listings on locators
+ *
+ * Content params
+ * @param? prettyQuery
+ * @param? servicesLabel
+ * @param? servicesField
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? useKilometers
+ * @param? modifier Use to vary the Teaser based on where it's called
+ */
+{template .chaz_default}
+  {call .chaz data="all"}
+    {param ctaURL: $profile.c_teaserCTA?.url /}
+    {param ctaText: $profile.c_teaserCTA?.linkText /}
+  {/call}
+{/template}
+
+
+/**
+ * @param baseUrl
+ * @param locale
+ * @param url
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param? relatedData
+ * @param? distance
+ * @param? listings Used in place of relatedData.listings on locators
+ *
+ * Content params
+ * @param? distance
+ * @param? prettyQuery
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? useKilometers
+ * @param? modifier Use to vary the Teaser based on where it's called
+ */
+{template .dill_short}
+  {let $hasDistance: isNonnull($distance?.distanceMiles) /}
+
+  <article class="Teaser Teaser--dillShort{if $modifier} Teaser--{$modifier}{/if}">
+    {call components.Util.HLevel}
+      {param contents}
+        {if $url}
+          <a class="Teaser-titleLink" href="{$baseUrl}{$url}" data-ya-track="businessname">
+            {call common.modules.LocationName data="all"}
+              {param hideSchema: true /}
+            {/call}
+          </a>
+        {else}
+          {call common.modules.LocationName data="all"}
+            {param hideSchema: true /}
+          {/call}
+        {/if}
+      {/param}
+      {param class: 'Teaser-title' /}
+      {param level: $hLevel ?: 3 /}
+    {/call}
+    {if length($profile.hours?.normalHours ?: []) > 0}
+      <div class="Teaser-open">
+        {call components.Hours.HoursToday data="all"}
+          {param hours: $profile.hours.normalHours /}
+          {param hideSchema: true /}
+        {/call}
+      </div>
+    {/if}
+    <div class="Teaser-locationRow">
+      <div class="Teaser-address">
+        {call components.Address.Address data="all"}
+          {param regionAbbr: true /}
+          {param hideSchema: true /}
+        {/call}
+      </div>
+      {if $hasDistance}
+        <div class="Teaser-miles">
+          {call .distanceToQuery data="all" /}
+        </div>
+      {/if}
+    </div>
+  </article>
+{/template}
+
+
+/**
+ * @param baseUrl
+ * @param locale
+ * @param url
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param? relatedData
+ * @param? distance
+ * @param? listings Used in place of relatedData.listings on locators
+ *
+ * Content params
+ * @param? prettyQuery
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? useKilometers
+ * @param? modifier Use to vary the Teaser based on where it's called
+ */
+{template .dill_short_default}
+  {call .dill_short data="all" /}
+{/template}
+
+
+/**
+ * @param baseUrl
+ * @param locale
+ * @param url
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param? relatedData
+ * @param? distance
+ * @param? listings Used in place of relatedData.listings on locators
+ *
+ * Content params
+ * @param? ctaText
+ * @param? ctaURL
+ * @param? prettyQuery
+ * @param? servicesLabel
+ * @param? servicesField
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? useKilometers
+ * @param? modifier Use to vary the Teaser based on where it's called
+ */
+{template .dill_detail}
+  {let $hasDistance: isNonnull($distance?.distanceMiles) /}
+  <article class="Teaser Teaser--dillDetail{if $modifier} Teaser--{$modifier}{/if}">
+    <div class="Teaser-top">
+      {call components.Util.HLevel}
+        {param contents}
+          {if $url}
+            <a class="Teaser-titleLink" href="{$baseUrl}{$url}" data-ya-track="businessname">
+              {call common.modules.LocationName data="all"}
+                {param hideSchema: true /}
+              {/call}
+            </a>
+          {else}
+            {call common.modules.LocationName data="all"}
+              {param hideSchema: true /}
+            {/call}
+          {/if}
+        {/param}
+        {param class: 'Teaser-title' /}
+        {param level: $hLevel ?: 3 /}
+      {/call}
+
+      {if length($profile.hours?.normalHours ?: []) > 0}
+        <div class="Teaser-open">
+          {call components.Hours.HoursToday data="all"}
+            {param hours: $profile.hours.normalHours /}
+            {param hideSchema: true /}
+          {/call}
+        </div>
+      {/if}
+
+      <div class="Teaser-address">
+        {call components.Address.Address data="all"}
+          {param regionAbbr: true /}
+          {param hideSchema: true /}
+        {/call}
+      </div>
+    </div>
+
+    <div class="Teaser-contact">
+      <div class="Teaser-directionsRow">
+        <div class="Teaser-link Teaser-directions">
+          {call components.Maps.GetDirections data="all" /}
+        </div>
+        {if $hasDistance}
+          <div class="Teaser-miles">
+            {call .distanceToQuery data="all" /}
+          </div>
+        {/if}
+      </div>
+
+      {if $profile.mainPhone}
+        <div class="Teaser-phone">
+          {call components.Phone.Phone data="all"}
+            {param phone: $profile.mainPhone /}
+            {param phoneType: 'main' /}
+            {param label}
+              <span class="sr-only">
+                {call strings.phone_label /}
+              </span>
+            {/param}
+            {param hideSchema: true /}
+          {/call}
+        </div>
+      {/if}
+    </div>
+
+    {call .services data="all" /}
+
+    {if length($profile.hours?.normalHours ?: [])}
+      <div class="Teaser-hours">
+        {call components.Hours.Hours data="all"}
+          {param hours: $profile.hours.normalHours /}
+          {param additionalHoursText: $profile.additionalHoursText /}
+          {param hLevel: null /}
+        {/call}
+      </div>
+    {/if}
+
+    {if $ctaURL or $url}
+      {let $defaultCtaText}
+        {call strings.teaser_defaultCTAText /}
+      {/let}
+      <a class="Teaser-link Teaser-cta" href="{$ctaURL ? $ctaURL : $baseUrl + $url}"
+         data-ya-track="{if $ctaURL}cta{else}visitpage{/if}">
+        {$ctaText ? $ctaText : $defaultCtaText}
+      </a>
+    {/if}
+  </article>
+{/template}
+
+
+/**
+ * @param baseUrl
+ * @param url
+ * @param locale
+ *
+ * Entity
+ * @param profile
+ * @param derivedData
+ * @param? relatedData
+ * @param? distance
+ * @param? listings Used in place of relatedData.listings on locators
+ *
+ * Content params
+ * @param? prettyQuery
+ * @param? servicesLabel
+ * @param? servicesField
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? useKilometers
+ * @param? modifier Use to vary the Teaser based on where it's called
+ */
+{template .dill_detail_default}
+  {call .dill_detail data="all"}
+    {param ctaURL: $profile.c_teaserCTA?.url /}
+    {param ctaText: $profile.c_teaserCTA?.linkText /}
+  {/call}
+{/template}
+
+
+/**
+ * @param distance
+ * @param? prettyQuery
+ * @param? useKilometers
+ */
+{template .distanceToQuery}
+  {let $distToQuery}
+    {call .formatDistance data="all" /}
+  {/let}
+  {let $queryText}
+    {if $prettyQuery}
+      {$prettyQuery |noAutoescape}
+    {else}
+      {call strings.teaser_distanceTo_queryText /}
+    {/if}
+  {/let}
+  {let $searchQuery}
+    <span class="sr-only">
+      {call strings.teaser_distanceTo_to /}
+      {sp}{$queryText |noAutoescape}
+    </span>
+  {/let}
+  {$distToQuery |noAutoescape} {$searchQuery |noAutoescape}
+{/template}
+
+/**
+ * @param distance
+ * @param? useKilometers
+ */
+{template .formatDistance}
+  {let $dist: $useKilometers ? ($distance.distanceKilometers ?: $distance * 1.60934) : ($distance.distanceMiles ?: $distance) /}
+  {floor($dist)}
+  {if $dist < 10}
+    {let $decimal: floor(100 * ($dist - floor($dist))) /}
+    .{$decimal < 10 ? '0'+$decimal : $decimal}
+  {/if}
+  &nbsp;{$useKilometers ? 'km' : 'mi'}
+{/template}
+
+
+/**
+ * @param profile
+ * @param? servicesLabel
+ * @param? servicesField
+ */
+{template .services}
+  {if length($profile[$servicesField ? $servicesField : 'services'] ?: [])}
+    <div class="Teaser-services">
+      <div class="Teaser-servicesLabel">
+        {if $servicesLabel}
+          {$servicesLabel |noAutoescape}
+        {else}
+          {call strings.services_title /}
+        {/if}
+      </div>
+      {foreach $service in $profile[$servicesField ? $servicesField : 'services']}
+        {$service}{if not isLast($service)}, {/if}
+      {/foreach}
+    </div>
+  {/if}
+{/template}

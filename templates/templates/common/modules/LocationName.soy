@@ -1,0 +1,33 @@
+{namespace common.modules}
+
+/**
+ * @param profile
+ * @param? hideSpans
+ * @param? hideSchema
+ */
+{template .LocationName}
+  {if not $hideSpans}
+    <span class="LocationName"{if not $hideSchema} itemprop="name" id="location-name"{/if}>
+      <span class="LocationName-brand">
+        {$profile.name}
+      </span>
+      {sp}
+      <span class="LocationName-geo">
+        {if $profile.address.line1}
+          {$profile.address.line1}
+        {else}
+          {$profile.address.city}
+        {/if}
+      </span>
+    </span>
+  {else}
+    {$profile.name}
+    {sp}
+    {if $profile.address.line1}
+      {$profile.address.line1}
+    {else}
+      {$profile.address.city}
+    {/if}
+  {/if}
+{/template}
+

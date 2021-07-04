@@ -1,0 +1,371 @@
+{namespace common.helpers}
+
+/**
+ */
+{template .keywords}
+  // TODO: Put some keywords here!
+{/template}
+
+/**
+ * @param isHttps
+ * @param locale
+ * @param siteDomain
+ * @param versions
+ */
+{template .canonical_link}
+  <link rel="canonical" href="{call .canonical_link_url data="all" /}" />
+{/template}
+
+/**
+ * @param isHttps
+ * @param locale
+ * @param siteDomain
+ * @param versions
+ */
+{template .canonical_link_url}
+  {let $path: $versions[$locale] == 'index.html' ? '' : $versions[$locale] /}
+  http{if $isHttps}s{/if}://{$siteDomain}/{$path |noAutoescape}
+{/template}
+
+/**
+ * @param isHttps
+ * @param locale
+ * @param siteDomain
+ * @param versions
+ */
+{template .alternate_links}
+  {foreach $alternateLocale in keys($versions)}
+    {if $alternateLocale != $locale}
+      <link rel="alternate"
+            hreflang="{$alternateLocale |casing:'lower' |rreplace:'_','-'}"
+            href="{call .canonical_link_url data="all"}{param locale: $alternateLocale /}{/call}">
+    {/if}
+  {/foreach}
+{/template}
+
+/**
+ * @param key
+ * @param value
+ */
+{template .set_yext_property}
+  <script>
+    window.Yext = (function(Yext){lb}
+      Yext["{$key}"] = {$value |json};
+      return Yext;
+    {rb})(window.Yext || {lb}{rb});
+  </script>
+{/template}
+
+/**
+ * @param baseUrl
+ */
+{template .set_baseUrl}
+  {call .set_yext_property}
+    {param key: 'baseUrl' /}
+    {param value: $baseUrl /}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ */
+{template .set_locale}
+  {call .set_yext_property}
+    {param key: 'locale' /}
+    {param value: $locale /}
+  {/call}
+{/template}
+
+/**
+ * @param profile
+ */
+{template .set_entityId}
+  {call .set_yext_property}
+    {param key: 'EntityId' /}
+    {param value: $profile.meta.id /}
+  {/call}
+{/template}
+
+/**
+ * noopener and noreferrer are used for extra security
+ * https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
+ */
+{template .link_new_tab}
+  {sp}target="_blank" rel="noopener noreferrer"
+{/template}
+
+/**
+ * @param email
+ */
+{template .obfuscate_mailto}
+  {if $email}
+    data-adr-val="{$email |encodeBase64}"
+  {/if}
+{/template}
+
+/**
+ * @param image
+ * @param? size
+ */
+{template .image_url}
+  {if $image.image}
+    {imageBySizeEntity($image.image, $size ? $size : '450x450')}
+  {/if}
+{/template}
+
+/**
+ * @param phone
+ */
+{template .phone_link}
+  tel:{$phone.number}
+{/template}
+
+/**
+ * @param link
+ * @param linkType
+ */
+{template .ctaUrl}
+  {switch $linkType}
+    {case 'Email'}
+      mailto:{$link |noAutoescape}
+    {case 'Phone'}
+      tel:{$link |noAutoescape}
+    {default}
+      {$link |noAutoescape}
+  {/switch}
+{/template}
+
+/**
+ * @param content
+ */
+{template .newline_to_br}
+  {rreplace($content, '\r\n|\r|\n', '<br>') |noAutoescape}
+{/template}
+
+/**
+ * @param baseUrl
+ * @param locale
+ * @param siteAttributes
+ *
+ * Configuration params
+ * @param? defaultValue
+ * @param? formLabel
+ * @param? placeHolder
+ * @param? searcherPath
+ * @param? optionalInputs
+ *
+ * Filters params
+ * @param? showFilters
+ * @param? queryParams
+ * @param? schema
+ * @param? customParams
+*/
+{template .simple_search}
+  {let $searchHelpText}
+    {call strings.search_label /}
+  {/let}
+
+  {call components.Search.Search_form data="all"}
+    {param searcherPath}
+      {if $searcherPath}
+        {$searcherPath |noAutoescape}
+      {else}
+        {$baseUrl}{call url.search data="all" /}
+      {/if}
+    {/param}
+    {param content}
+      {call components.Search.Search_input data="all"}
+        {param formLabel}
+          {call components.Svg.Icon data="all"}
+            {param iconName: 'search' /}
+          {/call}
+          <span class="sr-only">
+            {$searchHelpText}
+          </span>
+        {/param}
+        {param queryParameter: 'q' /}
+        {param placeHolder}
+          {if $placeHolder}
+            {$placeHolder |noAutoescape}
+          {elseif strlen($siteAttributes?.search?.placeholder ?: '') > 0}
+            {$siteAttributes.search.placeholder |noAutoescape}
+          {else}
+            {call strings.search_placeholder /}
+          {/if}
+        {/param}
+      {/call}
+      {call components.Search.Search_button data="all"}
+        {param submitLabel}
+          {call strings.search_submit /}
+        {/param}
+      {/call}
+      {call components.Search.Search_optionalInputs data="all"}
+        {param optionalInputs}
+          {if $optionalInputs}
+            {$optionalInputs |noAutoescape}
+          {/if}
+          {if $showFilters}
+            {call search.Filters data="all" /}
+          {/if}
+        {/param}
+      {/call}
+    {/param}
+  {/call}
+{/template}
+
+/**
+ * @param crumbUrls
+ * @param https
+ * @param siteDomain
+ */
+{template .app_search_metadata}
+  {call components.AssociatedApps.AppSearchMetadata data="all"}
+    {param apple_app_id: 'my_apple_app_id' /}
+  {/call}
+{/template}
+
+/**
+ * @param address
+ * @param pageLevel
+ * @param siteAttributes
+ */
+{template .google_analytics}
+  {if length(keys($siteAttributes.google_analytics ?: [:])) > 0}
+    {call components.GoogleAnalytics.ScriptPreload /}
+    {call components.GoogleAnalytics.Init data="all" /}
+    {foreach $name in keys($siteAttributes.google_analytics)}
+      {let $gaId: $siteAttributes.google_analytics[$name] /}
+      {call components.GoogleAnalytics.AddTracker}
+        {param id: $gaId /}
+        {param name: $name /}
+      {/call}
+      {if $name == 'yext'}
+        {switch $pageLevel}
+          {case 'country'}
+            {call components.GoogleAnalytics.SendEvent data="all"}
+              {param name: $name /}
+              {param properties: [
+                'hitType': 'pageview',
+                'dimension1': $pageLevel,
+                'dimension2': $address.countryCode
+              ] /}
+            {/call}
+          {case 'state'}
+            {call components.GoogleAnalytics.SendEvent data="all"}
+              {param name: $name /}
+              {param properties: [
+                'hitType': 'pageview',
+                'dimension1': $pageLevel,
+                'dimension2': $address.region,
+                'dimension3': $address.countryCode
+              ] /}
+            {/call}
+          {case 'city'}
+            {call components.GoogleAnalytics.SendEvent data="all"}
+              {param name: $name /}
+              {param properties: [
+                'hitType': 'pageview',
+                'dimension1': $pageLevel,
+                'dimension2': $address.region,
+                'dimension3': $address.city,
+                'dimension4': $address.countryCode
+              ] /}
+            {/call}
+          {case 'locationEntity'}
+            {call components.GoogleAnalytics.SendEvent data="all"}
+              {param name: $name /}
+              {param properties: [
+                'hitType': 'pageview',
+                'dimension1': $pageLevel,
+                'dimension2': $address.region,
+                'dimension3': $address.city,
+                'dimension4': $address.line1,
+                'dimension5': $address.postalCode,
+                'dimension6': $address.countryCode
+              ] /}
+            {/call}
+          {default}
+            {call components.GoogleAnalytics.SendPageView}
+              {param name: $name /}
+            {/call}
+        {/switch}
+      {else}
+        {call components.GoogleAnalytics.SendPageView}
+          {param name: $name /}
+        {/call}
+      {/if}
+    {/foreach}
+  {/if}
+{/template}
+
+/**
+ * @param siteAttributes
+ *
+ * Follow naming convention outlined below to add a gtm id in site attributes
+ * (_name is optional):
+ *   google_tag_manager.[TAGNAME]_id
+ *   google_tag_manager.[TAGNAME]_name
+ *
+ * Ex:
+ *   google_tag_manager.gtm1_id
+ *   google_tag_manager.gtm1_name
+ *   google_tag_manager.gtm2_id
+ *   google_tag_manager.gtm2_name
+ */
+{template .google_tag_manager_head}
+  {let $googleTagManager: $siteAttributes.google_tag_manager ?: [:] /}
+  {foreach $key in keys($googleTagManager)}
+    {let $keyLength: strlen($key) /}
+    {if $keyLength >= 3 and substring($key, $keyLength - 3, $keyLength) == '_id'}
+      {let $tagname: substring($key, 0, $keyLength - 3) /}
+      {let $id: $googleTagManager[$key] /}
+      {let $name: $googleTagManager[$tagname + '_name'] /}
+      {call components.GoogleTagManager.Head}
+        {param name: $name /}
+        {param id: $id /}
+      {/call}
+    {/if}
+  {/foreach}
+{/template}
+
+/**
+ * @param siteAttributes
+ *
+ * Follow naming convention outlined below to add a gtm id in site attributes
+ * (_name is optional):
+ *   google_tag_manager.[TAGNAME]_id
+ *   google_tag_manager.[TAGNAME]_name
+ *
+ * Ex:
+ *   google_tag_manager.gtm1_id
+ *   google_tag_manager.gtm1_name
+ *   google_tag_manager.gtm2_id
+ *   google_tag_manager.gtm2_name
+ */
+{template .google_tag_manager_body}
+  {let $googleTagManager: $siteAttributes.google_tag_manager ?: [:] /}
+  {foreach $key in keys($googleTagManager)}
+    {let $keyLength: strlen($key) /}
+    {if $keyLength >= 3 and substring($key, $keyLength - 3, $keyLength) == '_id'}
+      {let $tagname: substring($key, 0, $keyLength - 3) /}
+      {let $id: $googleTagManager[$key] /}
+      {let $name: $googleTagManager[$tagname + '_name'] /}
+      {call components.GoogleTagManager.Body}
+        {param name: $name /}
+        {param id: $id /}
+      {/call}
+    {/if}
+  {/foreach}
+{/template}
+
+/**
+ * Yext analytics are enabled by a callback in global.js to give the client's script control.
+ * This is a fallback in case the client's script invokes enableYextAnalytics before global.js runs.
+ * @param? defaultEnabled
+ */
+{template .init_enableYextAnalytics}
+  <script>
+    window.yextAnalyticsEnabled={$defaultEnabled ? 'true' : 'false'};{nil}
+    window.enableYextAnalytics=window.enableYextAnalytics||function(){lb}window.yextAnalyticsEnabled=true{rb};
+  </script>
+{/template}

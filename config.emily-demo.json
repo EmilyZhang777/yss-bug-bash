@@ -1,0 +1,127 @@
+{
+  "configVersion": "1",
+  "deviceDetected": false,
+  "https": true,
+  "locales": ["en"],
+  "templateVersion": 8,
+  "features": [
+    {
+      "name": "Locations",
+      "entityPageSet": {
+        "urlTemplate": "url.location",
+        "template": "locationEntity.layout",
+        "entityType": "location",
+        "urlAliases": [
+          "url.idAlias"
+        ],
+        "nearbyRadius": 50,
+        "nearbyMax": 10
+      }
+    },
+    {
+      "name": "Geocode IP",
+      "geocodeIP": {
+        "urlTemplate": "url.geocodeIp"
+      }
+    },
+    {
+      "name": "XML Sitemap",
+      "xmlsitemap": {
+        "urlTemplate": "url.xmlSitemap",
+        "blacklist": ["feedback/", "robots.txt"]
+      }
+    },
+    {
+      "name": "404 Page",
+      "staticPage": {
+        "urlTemplate": "url.page_404",
+        "template": "static.four_oh_four"
+      }
+    },
+    {
+      "name": "Robots.txt",
+      "staticPage": {
+        "urlTemplate": "url.page_robotstxt",
+        "template": "static.robotstxt"
+      }
+    },
+    {
+      "name": "State - City Drilldown",
+      "entityDirectory": {
+        "levels": [
+          {
+            "urlTemplate": "url.directoryStateList",
+            "template": "directory.stateList",
+            "field": {
+              "name": "address.region"
+            },
+            "orderBy": {
+              "field": {
+                "name": "derivedData.address.stateName"
+              },
+              "order": "ascending"
+            }
+          },
+          {
+            "urlTemplate": "url.directoryCityList",
+            "template": "directory.cityList",
+            "field": {
+              "name": "address.city"
+            },
+            "orderBy": {
+              "field": {
+                "name": "profile.address.city"
+              },
+              "order": "ascending"
+            }
+          },
+          {
+            "urlTemplate": "url.directoryLocationList",
+            "template": "directory.locationList",
+            "field": {
+              "name": "address.line1"
+            },
+            "orderBy": {
+              "field": {
+                "name": "profile.address.line1"
+              },
+              "order": "ascending"
+            }
+          }
+        ],
+        "entityPageSet": "Locations"
+      }
+    },
+    {
+      "name": "Search",
+      "entitySearch": {
+        "pageSet": "Locations",
+        "urlTemplate": "url.search",
+        "template": "search.layout",
+        "filterTemplate": "search.filters_config",
+        "apiParams": [
+          {
+            "name": "location",
+            "queryParam": "q"
+          },
+          {
+            "name": "limit",
+            "queryParam": "per"
+          },
+          {
+            "name": "offset",
+            "queryParam": "offset"
+          },
+          {
+            "name": "radius",
+            "queryParam": "r"
+          },
+          {
+            "name": "languages",
+            "queryParam": "l"
+          }
+        ]
+      }
+    }
+  ]
+}

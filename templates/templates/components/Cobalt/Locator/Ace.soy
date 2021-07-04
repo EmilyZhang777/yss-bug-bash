@@ -1,0 +1,111 @@
+{namespace cobalt.locator}
+
+/**
+ * @param baseUrl
+ * @param locale
+ * @param siteInternalHostName
+ * @param? siteAttributes
+ *
+ * Content params
+ * @param? ctaText
+ * @param? ctaTextField
+ * @param? ctaURLField
+ * @param? footer
+ * @param? geolocateSVG
+ * @param? initialContent
+ * @param? searchButtonContent
+ * @param? searchLabelText
+ * @param? searchPlaceholderText
+ * @param? servicesCustomField
+ * @param? servicesLabel
+ *
+ * Configuration params
+ * @param? h1
+ * @param? resultType
+ * @param? resultTypePlural
+ * @param? searcherPath
+ * @param? teaserModifier
+ * @param? useKilometers
+ *
+ * Filters params
+ * @param customParams
+ * @param schema
+ * @param? filtersTitle
+ * @param? filtersApplyText
+ * @param? filtersClearText
+ * @param? customFilters
+ * @param? filtersSVG
+ * @param? filtersCloseSVG
+ * @param? useDefaultFilters
+ */
+{template .ace}
+  <div id="js-locator" class="Locator Locator--ace">
+    {call components.SpinnerModal.SpinnerModal data="all" /}
+
+    {if $useDefaultFilters or $customFilters}
+      <div id="filters" class="Locator-filters">
+        <div class="Locator-overlay js-filters-overlay"></div>
+        <div id="filters-modal" class="Locator-filterFieldsWrapper">
+          {call .cobalt_filters data="all"}
+            {param class: 'Locator-filterFields' /}
+            {param content}
+              {if $useDefaultFilters}
+                {call search.Filters data="all"}
+                  {param queryParams: [:] /}
+                {/call}
+              {elseif $customFilters}
+                {$customFilters |noAutoescape}
+              {/if}
+            {/param}
+          {/call}
+        </div>
+      </div>
+    {/if}
+
+    {call .cobalt_params data="all" /}
+    <div id="js-map-wrapper" class="Locator-map">
+      <button class="Locator-reSearch js-pan-button is-hidden">
+        {call strings.locator_searchMapArea /}
+      </button>
+      {call components.Maps.Map data="all" /}
+    </div>
+    <div class="Locator-content">
+      <h1 class="Locator-title">
+        {if $h1}
+          {$h1 |noAutoescape}
+        {else}
+          {let $defaultResultType}
+            {call strings.locator_defaultResultTypeWithArticle /}
+          {/let}
+          {let $resultTypeText: $resultType ? $resultType : $defaultResultType /}
+          {msg desc="Find a Location"}
+            Find {$resultTypeText |title}
+          {/msg}
+        {/if}
+      </h1>
+      <div class="Locator-searchTitle">
+        {if $searchLabelText}
+          {$searchLabelText |noAutoescape}
+        {else}
+          {call strings.search_description /}
+        {/if}
+      </div>
+      <div class="Locator-searchWrapper">
+        {call .cobalt_search_form data="all"}
+          {param showFiltersButton: ($useDefaultFilters and length($customParams ?: []) > 0) or $customFilters /}
+        {/call}
+      </div>
+      <div class="Locator-resultsWrapper">
+        <a href="#js-locator" class="sr-only sr-only-focusable l-hidden-sm l-hidden-xs" id="skip-map">
+          {call strings.skipToMapText /}
+        </a>
+        <div class="Locator-resultsContainer js-locator-resultsContainer">
+          {call .cobalt_initial data="all" /}
+        </div>
+        {if $footer}
+          {$footer |noAutoescape}
+        {/if}
+      </div>
+    </div>
+  </div>
+{/template}

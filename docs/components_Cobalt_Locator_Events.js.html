@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/Cobalt/Locator/Events.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/Cobalt/Locator/Events.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>class LocatorEvent {
+  /**
+   * @param {string} id
+   * @param {Object} [opts={}] Additional options to be assigned to e.detail
+   */
+  constructor(id, opts = {}) {
+    const detail = { id, ...opts };
+    return new CustomEvent(this.constructor.eventTypeName, { detail });
+  }
+}
+
+/**
+ * @augments LocatorEvent
+ */
+class PinClickEvent extends LocatorEvent {
+  /**
+   * @constant {string}
+   * @default 'pin-click'
+   */
+  static get eventTypeName() {
+    return 'pin-click';
+  }
+
+  /**
+   * @param {string} id The locator ID of the pin, typically 'js-yl-' + entity.profile.id
+   */
+  constructor(id) {
+    super(id);
+  }
+}
+
+/**
+ * @augments LocatorEvent
+ */
+class PinFocusEvent extends LocatorEvent {
+  /**
+   * @constant {string}
+   * @default 'pin-focus'
+   */
+  static get eventTypeName() {
+    return 'pin-focus';
+  }
+
+  /**
+   * @param {string} id The locator ID of the pin, typically 'js-yl-' + entity.profile.id
+   * @param {boolean} [focused=false] true if the pin is gaining focus, false if losing focus
+   */
+  constructor(id, focused = false) {
+    super(id, { focused });
+  }
+}
+
+/**
+ * @augments LocatorEvent
+ */
+class PinHoverEvent extends LocatorEvent {
+  /**
+   * @constant {string}
+   * @default 'pin-hover'
+   */
+  static get eventTypeName() {
+    return 'pin-hover';
+  }
+
+  /**
+   * @param {string} id The locator ID of the pin, typically 'js-yl-' + entity.profile.id
+   * @param {boolean} [hovered=false] true if the pin has become hovered, false if it has become unhovered
+   */
+  constructor(id, hovered = false) {
+    super(id, { hovered });
+  }
+}
+
+/**
+ * @augments LocatorEvent
+ */
+class CardClickEvent extends LocatorEvent {
+  /**
+   * @constant {string}
+   * @default 'card-click'
+   */
+  static get eventTypeName() {
+    return 'card-click';
+  }
+
+  /**
+   * @param {string} id The locator ID of the result card, typically 'js-yl-' + entity.profile.id
+   */
+  constructor(id) {
+    super(id);
+  }
+}
+
+/**
+ * @augments LocatorEvent
+ */
+class CardFocusEvent extends LocatorEvent {
+  /**
+   * @constant {string}
+   * @default 'card-focus'
+   */
+  static get eventTypeName() {
+    return 'card-focus';
+  }
+
+  /**
+   * @param {string} id The locator ID of the result card, typically 'js-yl-' + entity.profile.id
+   * @param {boolean} [focused=false] true if the card is gaining focus, false if losing focus
+   */
+  constructor(id, focused = false) {
+    super(id, { focused });
+  }
+}
+
+/**
+ * @augments LocatorEvent
+ */
+class CardHoverEvent extends LocatorEvent {
+  /**
+   * @constant {string}
+   * @default 'card-hover'
+   */
+  static get eventTypeName() {
+    return 'card-hover';
+  }
+
+  /**
+   * @param {string} id The locator ID of the result card, typically 'js-yl-' + entity.profile.id
+   * @param {boolean} [hovered=false] true if the card has become hovered, false if it has become unhovered
+   */
+  constructor(id, hovered = false) {
+    super(id, { hovered });
+  }
+}
+
+/**
+ * @augments LocatorEvent
+ */
+class MapMoveEvent extends LocatorEvent {
+  /**
+   * @constant {string}
+   * @default 'map-move'
+   */
+  static get eventTypeName() {
+    return 'map-move';
+  }
+
+  /**
+   * @param {string} id The ID of the map that moved
+   * @param {?GeoBounds} previousBounds The map bounds before the move
+   * @param {?GeoBounds} currentBounds The map bounds after the move
+   */
+  constructor(id, previousBounds, currentBounds) {
+    super(id, { previousBounds, currentBounds });
+  }
+}
+
+export {
+  LocatorEvent,
+  PinClickEvent,
+  PinFocusEvent,
+  PinHoverEvent,
+  CardClickEvent,
+  CardFocusEvent,
+  CardHoverEvent,
+  MapMoveEvent
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="CobaltAce.html">CobaltAce</a></li><li><a href="CobaltChaz.html">CobaltChaz</a></li><li><a href="CobaltDill.html">CobaltDill</a></li></ul><h3>Classes</h3><ul><li><a href="-_anonymous_-goog.dom.DomHelper.html">DomHelper</a></li><li><a href="-_anonymous_-goog.i18n.BidiFormatter.html">BidiFormatter</a></li><li><a href="-_anonymous_-goog.inherits-tempCtor.html">tempCtor</a></li><li><a href="-_anonymous_-goog.soy.data.SanitizedContent.html">SanitizedContent</a></li><li><a href="-_anonymous_-goog.string.StringBuffer.html">StringBuffer</a></li><li><a href="-_anonymous_-soy.$$augmentMap-TempCtor.html">TempCtor</a></li><li><a href="-_anonymous_-soy.StringBuilder.html">StringBuilder</a></li><li><a href="-_anonymous_-soydata.$$makeSanitizedContentFactory_-InstantiableCtor.html">InstantiableCtor</a></li><li><a href="-_anonymous_-soydata.SanitizedCss.html">SanitizedCss</a></li><li><a href="-_anonymous_-soydata.SanitizedHtml.html">SanitizedHtml</a></li><li><a href="-_anonymous_-soydata.SanitizedHtmlAttribute.html">SanitizedHtmlAttribute</a></li><li><a href="-_anonymous_-soydata.SanitizedJs.html">SanitizedJs</a></li><li><a href="-_anonymous_-soydata.SanitizedJsStrChars.html">SanitizedJsStrChars</a></li><li><a href="-_anonymous_-soydata.SanitizedUri.html">SanitizedUri</a></li><li><a href="-_anonymous_-soydata.UnsanitizedText.html">UnsanitizedText</a></li><li><a href="CardClickEvent.html">CardClickEvent</a></li><li><a href="CardFocusEvent.html">CardFocusEvent</a></li><li><a href="CardHoverEvent.html">CardHoverEvent</a></li><li><a href="LocatorEvent.html">LocatorEvent</a></li><li><a href="MapMoveEvent.html">MapMoveEvent</a></li><li><a href="PinClickEvent.html">PinClickEvent</a></li><li><a href="PinFocusEvent.html">PinFocusEvent</a></li><li><a href="PinHoverEvent.html">PinHoverEvent</a></li></ul><h3>Global</h3><ul><li><a href="global.html#__webpack_public_path__">__webpack_public_path__</a></li><li><a href="global.html#IE">IE</a></li><li><a href="global.html#OPERA">OPERA</a></li><li><a href="global.html#sortListByKeys">sortListByKeys</a></li><li><a href="global.html#WEBKIT">WEBKIT</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sun Jul 04 2021 12:11:33 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

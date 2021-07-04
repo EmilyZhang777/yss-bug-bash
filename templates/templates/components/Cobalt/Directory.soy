@@ -1,0 +1,96 @@
+{namespace cobalt.directory}
+
+/**
+ * @param baseUrl
+ *
+ * Content params
+ * @param keys
+ * @param? title
+ * @param? directoryHierarchy
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? pageLevel
+ * @param? showNumLocs
+ * @param? yaTrackName
+ * @param? yaScopeName
+ */
+{template .ace_list}
+
+  <{$htmlTag ?: 'div'} class="Directory Directory--ace{if $modifier} {$modifier}{/if}"
+    {if $yaScopeName} data-ya-scope="{$yaScopeName}"{/if}>
+  {if $title}
+    <div class="Directory-titleRow Directory-row">
+      <h{$hLevel ?: '1'} class="Directory-title">
+        {$title |noAutoescape}
+      </h{$hLevel ?: '1'}>
+    </div>
+  {/if}
+  <div class="Directory-content">
+    <ul class="Directory-listLinks">
+      {foreach $key in $keys}
+        <li class="Directory-listItem">
+          <a class="Directory-listLink"
+             href="{$baseUrl}{call directory.url_for_key data="all"}{param key: $key /}{/call}"
+               data-ya-track="{$yaTrackName ?: 'todirectory'}"{if $showNumLocs} data-count="({$key.count})"{/if}>
+              <span class="Directory-listLinkText">
+                {call directory.directory_list_link_title data="all"}
+                  {param key: $key /}
+                {/call}
+              </span>
+          </a>
+        </li>
+      {/foreach}
+    </ul>
+  </div>
+  </{$htmlTag ?: 'div'}>
+{/template}
+
+/**
+ * @param baseUrl
+ * @param locale
+ *
+ * Content params
+ * @param keys
+ * @param? title
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? teaserHLevel
+ * @param? teaserModifier
+ * @param? yaScopeName
+ */
+ {template .ace_grid}
+
+  <{$htmlTag ?: 'div'} class="Directory Directory--ace{if $modifier} {$modifier}{/if}"
+    {if $yaScopeName} data-ya-scope="{$yaScopeName}"{/if}>
+    {if $title}
+      <div class="Directory-titleRow Directory-row">
+        <h{$hLevel ?: '1'} class="Directory-title">
+          {$title |noAutoescape}
+        </h{$hLevel ?: '1'}>
+      </div>
+    {/if}
+    <div class="Directory-content">
+      <ul class="Directory-listTeasers Directory-row{if length($keys) == 1} Directory-listTeasers--single{/if}">
+        {foreach $key in $keys}
+          {let $entity: $key.entity /}
+          <li class="Directory-listTeaser{if length($keys) == 1} Directory-listTeaser--single{/if}">
+            {call common.modules.Teaser data="$entity"}
+              {param baseUrl: $baseUrl /}
+              {param url: $key.url /}
+              {param locale: $locale /}
+              {param modifier: $teaserModifier ?: 'directory' /}
+              {param hLevel: $teaserHLevel ?: 2 /}
+              {param callerTemplateName: 'cobalt.directory.ace_grid' /}
+            {/call}
+          </li>
+        {/foreach}
+      </ul>
+    </div>
+  </{$htmlTag ?: 'div'}>
+{/template}

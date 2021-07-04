@@ -1,0 +1,64 @@
+{namespace cobalt.footer}
+
+/**
+ * @param? baseUrl
+ * @param siteAttributes
+ * @param? links
+ * @param? hideSchema
+ * @param? modifier
+ * @param? text
+ * @param? useSiteAttributes
+ *
+ * Social Component
+ * @param? socialOrder
+ * @param? yaTrackSocial
+ * @param? facebook_url
+ * @param? twitter_url
+ * @param? pinterest_url
+ * @param? google_plus_url
+ * @param? youtube_url
+ * @param? instagram_url
+ * @param? linkedin_url
+*/
+{template .ace }
+  <footer class="Footer Footer--ace{if $modifier} {$modifier}{/if}" data-ya-scope="footer">
+    <div class="Footer-linksWrapper">
+      <div class="Footer-links">
+        {if not $links and $useSiteAttributes}
+          {let $footerLinks: $siteAttributes?.footer ?: [:] /}
+          {let $totalLinks: (length(keys($footerLinks)) > 0) ? (floor((length(keys($footerLinks)) - 1) / 2)) : 0 /}
+          {for $i in range($totalLinks)}
+            {if $footerLinks['text' + ($i + 1)] and $footerLinks['href' + ($i + 1)]}
+              <a class="Footer-link"
+                 href="{$footerLinks['href' + ($i + 1)]}"
+                 data-ya-track="link#">
+                {$footerLinks['text' + ($i + 1)] |noAutoescape}
+              </a>
+            {/if}
+          {/for}
+        {elseif $links}
+          {foreach $link in $links}
+            <a class="Footer-link" href="{$link.href}" data-ya-track="link#">
+              {$link.text |noAutoescape}
+            </a>
+          {/foreach}
+        {/if}
+      </div>
+
+      {if $facebook_url or $twitter_url or $pinterest_url or $google_plus_url or $youtube_url or $linkedin_url or $instagram_url}
+        <div class="Footer-social">
+          {call components.Social.Links data="all"}
+            {param yaTrack: $yaTrackSocial /}
+            {param customOrder: $socialOrder /}
+          {/call}
+        </div>
+      {/if}
+    </div>
+
+    {if $text}
+      <div class="Footer-text">
+        {$text |noAutoescape}
+      </div>
+    {/if}
+  </footer>
+{/template}

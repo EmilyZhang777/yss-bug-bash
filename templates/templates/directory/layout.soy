@@ -1,0 +1,120 @@
+{namespace directory}
+
+/**
+ * This template is intended to be heavily modified as needed on each implementation.
+ * Elements that are common to all directory pages should be customized here.
+ * This may include modifying the passed in page content parameter, e.g.
+ * {param pageContent}
+ *    some custom stuff for directories
+ *   {$pageContent | noAutoescape}
+ * {/param}
+ * The templating structure is heavily inspired by the hierarchy of templates in Rails.
+ * See http://guides.rubyonrails.org/layouts_and_rendering.html#understanding-yield for more information.
+ *
+ * @param baseUrl
+ * @param businessId
+ * @param crumbNames
+ * @param crumbUrls
+ * @param isHttps
+ * @param isStaging
+ * @param locale
+ * @param siteAttributes
+ * @param siteDomain
+ * @param siteId
+ * @param siteInternalHostName
+ * @param versions
+ *
+ * Directory params
+ * @param directoryId
+ * @param entityCount
+ * @param keys
+ *
+ * Content params
+ * @param? bodyInclude
+ * @param? headInclude
+ * @param? schemaScope
+ * @param pageContent
+ * @param soyTemplateName
+ *
+ * Configuration params
+ * @param isHttps
+ * @param? hideHeader
+ */
+{template .layout}
+
+  {let $name: $keys[0].entity.profile.name /}
+  {let $city: $keys[0].entity.profile.address.city /}
+  {let $region: $keys[0].entity.profile.address.region /}
+
+  {let $title}
+    {if strContains($soyTemplateName, 'stateList')}
+      {msg desc="The title for the page that displays locations."}
+        {$name} locations
+      {/msg}
+    {elseif strContains($soyTemplateName, 'cityList')}
+      {msg desc="The title for the page that displays locations in a region or state."}
+        {$name} locations in {$region}
+      {/msg}
+    {elseif strContains($soyTemplateName, 'locationList')}
+      {msg desc="The title for the page that displays locations in a city, state."}
+        {$name} locations in {$city}, {$region}
+      {/msg}
+    {/if}
+  {/let}
+  {let $metaDesc}
+    {if strContains($soyTemplateName, 'stateList')}
+      {msg desc="The description for the page that displays locations."}
+        Browse all {$name} locations.
+      {/msg}
+    {elseif strContains($soyTemplateName, 'cityList')}
+      {msg desc="The description for the page that displays locations in a region or state."}
+        Browse all {$name} locations in {$region}.
+      {/msg}
+    {elseif strContains($soyTemplateName, 'locationList')}
+      {msg desc="The description for the page that displays locations in a city, state."}
+        Browse all {$name} locations in {$city}, {$region}.
+      {/msg}
+    {/if}
+  {/let}
+
+  {call common.layout data="all"}
+
+    {param pageTitle: $title /}
+    {param metaDescription: $metaDesc /}
+    {param metaKeywords}
+      {call common.helpers.keywords /}
+    {/param}
+
+    {param pageLevel}
+      {if strContains($soyTemplateName, 'stateList')}
+        all
+      {elseif strContains($soyTemplateName, 'cityList')}
+        state
+      {elseif strContains($soyTemplateName, 'locationList')}
+        city
+      {/if}
+    {/param}
+
+    {param profile: $keys[0].entity.profile /}
+
+    {param analytics}
+      {call components.YextAnalytics.Directory_default data="all" /}
+
+      {if strContains($soyTemplateName, 'cityList')}
+        {call components.GoogleAnalytics.Geo data="all"}
+          {param analyticsMap: $siteAttributes?.google_analytics ?: [:] /}
+          {param state: $keys[0].entity.derivedData.address.stateName /}
+          {param resultCount: $entityCount /}
+        {/call}
+      {elseif strContains($soyTemplateName, 'locationList')}
+        {call components.GoogleAnalytics.Geo data="all"}
+          {param analyticsMap: $siteAttributes?.google_analytics ?: [:] /}
+          {param city: $city /}
+          {param state: $keys[0].entity.derivedData.address.stateName /}
+          {param resultCount: $entityCount /}
+        {/call}
+      {/if}
+    {/param}
+
+  {/call}
+{/template}

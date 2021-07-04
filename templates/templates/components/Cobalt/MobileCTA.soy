@@ -1,0 +1,74 @@
+{namespace cobalt.mobileCTA}
+
+/**
+ * @param baseUrl
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ *
+ * Content params
+ * @param? directionsCopy
+ * @param? directionsImage
+ * @param? phoneCopy
+ * @param? phoneImage
+ * @param? uberCopy
+ * @param? uberImage
+ *
+ * Configuration params
+ * @param? yaDirections
+ * @param? yaPhone
+ * @param? modifier
+ */
+{template .ace}
+  {let $formattedPhoneLink}
+    {call common.helpers.phone_link}
+      {param phone: $profile.mainPhone /}
+    {/call}
+  {/let}
+  <div class="MobileCTA MobileCTA--ace {if $modifier} {$modifier}{/if}">
+    <div class="MobileCTA-item">
+      <a class="MobileCTA-link" href="{$formattedPhoneLink}" data-ya-track="{$yaPhone ?: 'phonecall'}">
+        <img class="MobileCTA-icon" src="{$phoneImage ? $phoneImage : $baseUrl + 'assets/images/uber_rides_icon.svg'}" alt="phone number">
+        <span class="MobileCTA-text">
+          {if $phoneCopy}
+            {$phoneCopy |noAutoescape}
+          {else}
+            {call strings.phone_CTAText /}
+          {/if}
+        </span>
+      </a>
+    </div>
+    <div class="MobileCTA-item">
+      <a class="MobileCTA-link" href="{call components.Maps.GetDirections_url data="all" /}" data-ya-track="{$yaDirections ?: 'drivingdirections'}">
+        <img class="MobileCTA-icon" src="{$directionsImage ? $directionsImage : $baseUrl + 'assets/images/uber_rides_icon.svg'}" alt="get directions">
+        <span class="MobileCTA-text">
+          {if $directionsCopy}
+            {$directionsCopy |noAutoescape}
+          {else}
+            {call strings.directionsCTAText /}
+          {/if}
+        </span>
+      </a>
+    </div>
+    <div class="MobileCTA-item">
+      <div class="MobileCTA-link">
+        <img class="MobileCTA-icon" src="{$uberImage ? $uberImage : $baseUrl + 'assets/images/uber_rides_icon.svg'}" alt="call an uber">
+        <div class="MobileCTA-text">
+          {call components.Uber.Uber data="all"}
+            {param linkText}
+              {if $uberCopy}
+                {$uberCopy |noAutoescape}
+              {else}
+                {call strings.uberCTAText /}
+              {/if}
+            {/param}
+            {param defaultClientId}
+              {call secrets.YextUberClientId /}
+            {/param}
+          {/call}
+        </div>
+      </div>
+    </div>
+  </div>
+{/template}

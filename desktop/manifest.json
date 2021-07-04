@@ -1,0 +1,10 @@
+{
+  "components": {
+    "Cobalt": {
+      "version": "3fe34078c437cde8dbdd475c60c54338290832fd"
+    },
+    "Secrets": {
+      "version": "3fe34078c437cde8dbdd475c60c54338290832fd"
+    }
+  }
+}

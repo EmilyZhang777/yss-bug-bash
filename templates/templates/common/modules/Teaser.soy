@@ -1,0 +1,52 @@
+{namespace common.modules}
+
+/**
+ * @param baseUrl
+ * @param locale
+ * @param url
+ *
+ * Entity params
+ * @param profile
+ * @param derivedData
+ * @param? relatedData
+ * @param? distance
+ * @param? listings Used in place of relatedData.listings on locators
+ *
+ * Content params
+ * @param? prettyQuery
+ * @param? servicesLabel
+ *
+ * Configuration params
+ * @param? callerTemplateName
+ * @param? hLevel
+ * @param? useKilometers
+ * @param? modifier Use to vary the Teaser based on where it's called
+ */
+{template .Teaser}
+  {if $callerTemplateName}
+    // All components that call the Teaser (such as the locationlist/nearby locations/locator)
+    // call common.modules.Teaser. They will provide this parameter in case you need different behavior
+    // on different pages. For example you might do:
+    // {if $callerTemplateName == 'cobalt.locator.ace'}
+    //   {call cobalt.teaser.ace data="all" /}
+    // {else}
+    //   {call cobalt.teaser.chaz data="all" /}
+    // {/if}
+  {/if}
+
+  {call cobalt.teaser.ace_default data="all" /}
+
+  // If site has a Cobalt Dill locator, use something like this:
+  // {if $callerTemplateName}
+  //   {if $callerTemplateName == 'cobalt.locator.cobalt_results'}
+  //     {call cobalt.teaser.dill_short_default data="all" /}
+  //   {elseif $callerTemplateName == 'cobalt.locator.detail'}
+  //     {call cobalt.teaser.dill_detail_default data="all" /}
+  //   {else}
+  //     {call cobalt.teaser.ace_default data="all" /}
+  //   {/if}
+  // {else}
+  //   {call cobalt.teaser.ace_default data="all" /}
+  // {/if}
+{/template}
+

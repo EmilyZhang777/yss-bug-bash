@@ -1,0 +1,87 @@
+{namespace cobalt.notificationBanner}
+
+/**
+ * @param bannerText
+ * @param? modifier
+ */
+{template .ace}
+  <div class="NotificationBanner NotificationBanner--ace{if $modifier} {$modifier}{/if}">
+    <div class="NotificationBanner-text">{$bannerText |noAutoescape}</div>
+  </div>
+{/template}
+
+
+/**
+ * @param heading
+ * @param bannerText
+ * @param? headingIcon
+ * @param? modifier
+ * @param? collapsible
+ * @param? CTAText
+ * @param? CTAUrl
+ * @param? useTransition
+ */
+{template .bev}
+  {let $toggleButtonLabel}
+    {call strings.notification_toggleButtonText /}
+  {/let}
+  <div class="NotificationBanner NotificationBanner--bev{if $modifier} {$modifier}{/if}">
+    <div class="NotificationBanner-header">
+      <div class="NotificationBanner-title">
+        {if $headingIcon}
+          <span class="NotificationBanner-icon">{$headingIcon | noAutoescape}</span>
+          {sp}
+        {/if}
+        <span class="NotificationBanner-heading">{$heading ?: ''}</span>
+      </div>
+      {if $collapsible}
+        <div class="NotificationBanner-toggleContainer">
+          {if $useTransition}
+            <button class="NotificationBanner-toggleButton" data-toggle="collapse" data-target="#NotificationBanner-collapsible" aria-label="{$toggleButtonLabel}" aria-controls="NotificationBanner-body">
+              <span class="NotificationBanner-toggleBar"></span>
+              <span class="NotificationBanner-toggleBar"></span>
+            </button>
+          {else}
+            <span class="NotificationBanner-toggle" data-toggle="collapse" data-target="#NotificationBanner-collapsible" aria-label="{$toggleButtonLabel}" aria-controls="NotificationBanner-body">
+            </span>
+          {/if}
+        </div>
+      {/if}
+    </div>
+    <div class="NotificationBanner-body collapse in" id="NotificationBanner-collapsible">
+      <div class="NotificationBanner-textContainer">
+        <div class="NotificationBanner-text">{$bannerText |noAutoescape}</div>
+      </div>
+      {if $CTAText and $CTAUrl}
+        <div class="NotificationBanner-cta">
+          <a class="NotificationBanner-Button" href="{$CTAUrl}">
+            {$CTAText}
+          </a>
+        </div>
+      {/if}
+    </div>
+  </div>
+{/template}
+
+/**
+ * Expects data from the c_notificationBanner custom field
+ *
+ * c_notificationBanner params
+ * @param? title
+ * @param? description
+ * @param? link
+ *
+ * Configuration params
+ * @param? headingIcon
+ * @param? modifier
+ * @param? collapsible
+ * @param? useTransition
+ */
+{template .bev_default}
+  {call .bev data="all"}
+    {param heading: $title /}
+    {param bannerText: $description /}
+    {param CTAText: $link?.linkText /}
+    {param CTAUrl: $link?.url /}
+  {/call}
+{/template}

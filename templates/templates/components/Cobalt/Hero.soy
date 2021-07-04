@@ -1,0 +1,327 @@
+{namespace cobalt.hero}
+
+/**
+ * @param baseUrl
+ *
+ * Entity params
+ * @param profile
+ * @param relatedData
+ * @param derivedData
+ *
+ * Content params
+ * @param? backgroundPhoto
+ * @param? ctaURL
+ * @param? ctaText
+ * @param? directionCTAText
+ * @param? phone
+ * @param? phoneCTAText
+ * @param? title
+ * @param? uberCTAText
+ *
+ * Configuration params
+ * @param? hidePhoneCTA
+ * @param? hideSchema
+ * @param? hideUber
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ * @param? yaScopeName
+ *
+ * Hours params
+ * @param? open24HoursMessage
+ * @param? hourIntervalSeparator
+ * @param? openTodayMessage
+ * @param? closedTodayMessage
+ * @param? collapseDays
+ * @param? allWeekMessage
+ * @param? disableOpenUntil
+ * @param? openUntilMidnightMessage
+ * @param? openUntilMessage
+ * @param? opensAtMessage
+ * @param? closedAtMessage
+ * @param? twentyFourHourClock
+ * @param? useDayForOpenToday
+ */
+{template .ace}
+  {let $imageUrl}
+    {if $backgroundPhoto}
+      {imageBySizeEntity($backgroundPhoto.image, '1440x366')}
+    {/if}
+  {/let}
+  <{$htmlTag ?: 'div'} class="Hero Hero--ace{if $modifier} {$modifier}{/if}"
+                       data-ya-scope="{$yaScopeName ? $yaScopeName : 'hero'}"
+                       {if $imageUrl}style="background-image: url({$imageUrl})"{/if}>
+    <div class="Hero-row1">
+      <h{$hLevel ?: '1'} class="Hero-title">
+        {if $title}
+          {$title | noAutoescape}
+        {else}
+          {call common.modules.LocationName data="all" /}
+        {/if}
+      </h{$hLevel ?: '1'}>
+
+      {if length($profile.hours?.normalHours ?: [])}
+        <div class="Hero-hoursToday">
+          {call components.Hours.HoursToday data="all"}
+            {param hours: $profile.hours.normalHours /}
+          {/call}
+        </div>
+      {/if}
+
+      <div class="Hero-buttons {if not $hidePhoneCTA}Hero--desktopOnly{/if}">
+        <div class="Hero-button Hero-getDirections">
+          {call components.Maps.GetDirections data="all" /}
+        </div>
+
+        {if $ctaURL and $ctaText}
+          <div class="Hero-buttonWrapper">
+            <a class="Hero-cta" href="{$ctaURL}"{if $yaTrackName} data-ya-track="{$yaTrackName}"{/if}>
+              {$ctaText}
+            </a>
+          </div>
+        {/if}
+
+        {if not $hideUber}
+          {call components.Uber.Uber data="all"}
+            {param uberIconBefore: true /}
+            {param modifier: 'Hero-buttonWrapper Hero-uber' /}
+            {param linkText}
+              {if $uberCTAText}
+                {$uberCTAText}
+              {else}
+                {call strings.uberCTAText /}
+              {/if}
+            {/param}
+            {param defaultClientId}
+              {call secrets.YextUberClientId /}
+            {/param}
+          {/call}
+        {/if}
+      </div>
+    </div>
+    {if not $hidePhoneCTA}
+      {let $phoneObject: $phone ?: $profile.mainPhone /}
+      <div class="Hero-row2">
+        <div class="Hero-mobileButtons">
+          <div class="Hero-mobileButtonWrapper">
+            {call .mobileButton data="all"}
+              {param modifier: 'phone' /}
+              {param url: 'tel:' + $phoneObject.number /}
+              {param yaTrackName: 'phone' /}
+              {param image: 'permanent-b0b701/assets/images/phone-default.08454d42.svg' /}
+              {param ctaText}
+                {if $phoneCTAText}
+                  {$phoneCTAText |noAutoescape}
+                {else}
+                  {call strings.phone_CTAText /}
+                {/if}
+              {/param}
+            {/call}
+          </div>
+          <div class="Hero-mobileButtonWrapper">
+            {call .mobileButton data="all"}
+              {param modifier: 'direction' /}
+              {param url}
+                {call components.Maps.GetDirections_url data="all" /}
+              {/param}
+              {param yaTrackName: 'directions' /}
+              {param image: 'permanent-b0b701/assets/images/directions-default.c307e439.svg' /}
+              {param ctaText}
+                {if $directionCTAText}
+                  {$directionCTAText |noAutoescape}
+                {else}
+                  {call strings.directionsCTAText /}
+                {/if}
+              {/param}
+            {/call}
+          </div>
+
+          {if not $hideUber}
+            {call components.Uber.Uber data="all"}
+              {param uberIconBefore: true /}
+              {param modifier: 'Hero-buttonWrapper Hero-uber Hero-mobileButton Hero-mobileButton--uber' /}
+              {param linkText}
+                {if $uberCTAText}
+                  {$uberCTAText |noAutoescape}
+                {else}
+                  {call strings.uberCTAText /}
+                {/if}
+              {/param}
+              {param defaultClientId}
+                {call secrets.YextUberClientId /}
+              {/param}
+            {/call}
+          {/if}
+        </div>
+
+        {if $ctaURL and $ctaText}
+          <div class="Hero-buttonWrapper">
+            <a class="Hero-cta" href="{$ctaURL}"{if $yaTrackName} data-ya-track="{$yaTrackName}"{/if}>
+              {$ctaText}
+            </a>
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </{$htmlTag ?: 'div'}>
+{/template}
+
+
+/**
+ * @param baseUrl
+ * @param ctaText
+ * @param image
+ * @param modifier
+ * @param url
+ * @param? altText
+ * @param? yaTrackName
+ */
+
+{template .mobileButton}
+  <a class="Hero-mobileButton Hero-mobileButton--{$modifier}" href="{$url}" {if $yaTrackName}data-ya-track="{$yaTrackName}"{/if}>
+    <img class="Hero-mobileButtonImage" src="{$baseUrl}{$image}" alt="{$altText?: ''}">
+
+    <span class="Hero-mobileButtonCaption">
+      {$ctaText}
+    </span>
+  </a>
+{/template}
+
+/**
+ * @param baseUrl
+ *
+ * Entity params
+ * @param profile
+ * @param relatedData
+ * @param derivedData
+ *
+ * Content params
+ * @param? directionCTAText
+ * @param? phone
+ * @param? phoneCTAText
+ * @param? title
+ * @param? uberCTAText
+ *
+ * Configuration params
+ * @param? hidePhoneCTA
+ * @param? hideSchema
+ * @param? hideUber
+ * @param? hLevel
+ * @param? htmlTag
+ * @param? modifier
+ * @param? yaTrackName
+ * @param? yaScopeName
+ *
+ * Hours params
+ * @param? collapseDays
+ * @param? disableOpenUntil
+ * @param? twentyFourHourClock
+ * @param? useDayForOpenToday
+ * @param? hourIntervalSeparator
+ * @param? allWeekMessage
+ * @param? closedAtMessage
+ * @param? closedTodayMessage
+ * @param? open24HoursMessage
+ * @param? opensAtMessage
+ * @param? openTodayMessage
+ * @param? openUntilMessage
+ * @param? openUntilMidnightMessage
+ */
+{template .ace_default}
+  {call .ace data="all"}
+    {param title: $profile.c_hero?.title /}
+    {param ctaText: $profile.c_hero?.callToAction?.linkText /}
+    {param ctaURL: $profile.c_hero?.callToAction?.url /}
+    {param backgroundPhoto: $profile.c_hero?.backgroundImage /}
+  {/call}
+{/template}
+
+/**
+ * Content params
+ * @param baseUrl
+ * @param locale
+ * @param title
+ * @param? entityCount
+ *
+ * Configuration params
+ * @param? hLevel
+ * @param? modifier
+ * @param? yaScopeName
+ * @param? geolocateText
+ */
+{template .dill}
+  {call components.SpinnerModal.SpinnerModal data="all" /}
+  <div class="Hero Hero--dill{if $modifier} {$modifier}{/if} l-container" data-ya-scope="{$yaScopeName ? $yaScopeName : 'hero'}">
+    <div class="Hero-row1">
+      <h{$hLevel ?: '1'} class="Hero-title">
+        {$title | noAutoescape}
+      </h{$hLevel ?: '1'}>
+      {if $entityCount}
+        <div class="Hero-numLocs">
+          {msg desc="X number of locations within a country or region."}
+            {plural $entityCount}
+              {case 1}
+                {$entityCount} Location
+              {default}
+                {$entityCount} Locations
+            {/plural}
+          {/msg}
+        </div>
+      {/if}
+    </div>
+    <div class="Hero-search">
+      <div class="Hero-searchDescription">
+        {call strings.search_description /}
+      </div>
+      {call components.Search.Search_form data="all"}
+        {param formId: 'HeroSearchForm' /}
+        {param class: 'Hero-form' /}
+        {param searcherPath}
+          {$baseUrl}{call url.search data="all" /}
+        {/param}
+        {param content}
+          <div class="Locator-searchBar">
+            {call components.Search.Search_input data="all"}
+              {param class: 'Hero-input js-locator-input' /}
+              {param formLabel}
+                <span class="sr-only">
+                  {call strings.search_label /}
+                </span>
+              {/param}
+              {param queryParameter: 'q' /}
+              {param placeHolder}
+                {call strings.search_placeholder /}
+              {/param}
+              {param inputId: 'DirectorySearchInput' /}
+            {/call}
+            {call components.Search.Search_button data="all"}
+              {param class: 'Hero-button' /}
+              {param submitLabel}
+                {call components.Svg.Icon data="all"}
+                  {param iconName: 'search' /}
+                {/call}
+                <span class="sr-only">
+                  {call strings.search_submit /}
+                </span>
+              {/param}
+              {param submitYaTrack: 'search' /}
+            {/call}
+          </div>
+          <div class="Hero-buttons">
+            <button type="button" class="Hero-button Hero-geolocate js-hero-geolocateTrigger" data-ya-track="geolocate">
+              {call components.Svg.Icon data="all"}
+                {param iconName: 'geolocate' /}
+              {/call}
+              {if $geolocateText}
+                <span class="Hero-geolocateText">
+                  {$geolocateText |noAutoescape}
+                </span>
+              {/if}
+            </button>
+          </div>
+        {/param}
+      {/call}
+    </div>
+  </div>
+{/template}

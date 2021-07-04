@@ -1,0 +1,384 @@
+{namespace cobalt.locator}
+
+/**
+ * @param baseUrl
+ * @param siteInternalHostName
+ *
+ * Content params
+ * @param? ctaText
+ * @param? ctaTextField
+ * @param? ctaURLField
+ * @param? servicesCustomField
+ * @param? servicesLabel
+ *
+ * Configuration params
+ * @param? resultType
+ * @param? resultTypePlural
+ * @param? teaserModifier
+ * @param? useKilometers
+ */
+{template .cobalt_params}
+  {call components.Util.DataForJs}
+    {param class: 'js-locator-params' /}
+    {param content: [
+      'baseUrl': $baseUrl,
+      'ctaText': $ctaText,
+      'ctaTextField': $ctaTextField,
+      'ctaURLField': $ctaURLField,
+      'resultType': $resultType,
+      'resultTypePlural': $resultTypePlural,
+      'servicesCustomField': $servicesCustomField,
+      'servicesLabel': $servicesLabel,
+      'siteInternalHostName': $siteInternalHostName,
+      'teaserModifier': $teaserModifier ?: 'locator',
+      'useKilometers': $useKilometers
+    ] /}
+  {/call}
+{/template}
+
+/**
+ * @param locale
+ * @param baseUrl
+ *
+ * Content params
+ * @param? initialContent
+ *
+ * Configuration params
+ * @param? resultType
+ */
+{template .cobalt_initial}
+  {let $browseDirectory}
+    <a href="{$baseUrl}{call url.root_page data="all" /}"
+       class="Locator-toDirectory"
+       data-ya-track="todirectory">
+      {call strings.locator_linkToDirectory /}
+    </a>
+  {/let}
+
+  {let $defaultResultType}
+    {call strings.locator_defaultResultTypeWithArticle /}
+  {/let}
+  {let $resultTypeText: $resultType ? $resultType : $defaultResultType /}
+
+  <div class="Locator-initial">
+    {if $initialContent}
+      {$initialContent |noAutoescape}
+    {else}
+      {msg desc=""}
+        Use our locator to find {$resultTypeText} near you or {$browseDirectory |noAutoescape}
+      {/msg}
+    {/if}
+  </div>
+{/template}
+
+/**
+ * @param baseUrl
+ * @param locale
+ * @param? siteAttributes
+ *
+ * Content params
+ * @param? filtersSVG
+ * @param? geolocateSVG
+ * @param? searchButtonContent
+ * @param? searchPlaceholderText
+ * @param? queryParams
+ *
+ * Configuration params
+ * @param? disableGeolocation
+ * @param? showFiltersButton
+ * @param? searcherPath
+ */
+{template .cobalt_search_form}
+  {let $query: $queryParams?.q?[0] /}
+  {let $prettyQuery: $queryParams?.qp?[0] /}
+
+  {let $searchHelpText}
+    {call strings.search_label /}
+  {/let}
+
+  {call components.Search.Search_form data="all"}
+    {param formId: 'search-form' /}
+    {param class: 'Locator-form' /}
+    {param searcherPath}
+      {if $searcherPath}
+        {$searcherPath |noAutoescape}
+      {else}
+        {$baseUrl}{call url.search data="all" /}
+      {/if}
+    {/param}
+    {param content}
+      <div class="Locator-searchBar">
+        {call components.Search.Search_input data="all"}
+          {param class: 'Locator-input js-locator-input' /}
+          {param formLabel}
+            <span class="sr-only">
+              {$searchHelpText}
+            </span>
+          {/param}
+          {param disableAutocomplete: true /}
+          {param inputId: 'q' /} // always q
+          {param queryParameter: 'q' /}
+          {param placeHolder}
+            {if $searchPlaceholderText}
+              {$searchPlaceholderText |noAutoescape}
+            {elseif $siteAttributes?.search?.placeholder}
+              {$siteAttributes.search.placeholder |noAutoescape}
+            {elseif $siteAttributes?.locator?.placeholderText}
+              {$siteAttributes.locator.placeholderText |noAutoescape}
+            {else}
+              {call strings.search_placeholder /}
+            {/if}
+          {/param}
+          {param defaultValue}
+            {if $prettyQuery}
+              {$prettyQuery}
+            {elseif $query}
+              {$query}
+            {/if}
+          {/param}
+        {/call}
+
+        {call components.Search.Search_button data="all"}
+          {param class: 'Locator-button Locator-button--search' /}
+          {param submitLabel}
+            {if $searchButtonContent}
+              {$searchButtonContent |noAutoescape}
+            {else}
+              {call components.Svg.Icon data="all"}
+                {param iconName: 'search' /}
+              {/call}
+            {/if}
+            <span class="sr-only">
+              {call strings.search_submit /}
+            </span>
+          {/param}
+          {param submitYaTrack: 'search' /}
+        {/call}
+      </div>
+      <div class="Locator-buttons">
+        {if not $disableGeolocation}
+          <button type="button" class="Locator-button Locator-button--geolocateTrigger js-locator-geolocateTrigger" data-ya-track="geolocate">
+            {if $geolocateSVG}
+              {$geolocateSVG |noAutoescape}
+            {else}
+              {call components.Svg.Icon data="all"}
+                {param iconName: 'geolocate' /}
+              {/call}
+            {/if}
+            <span class="sr-only">
+              {call strings.geolocateButtonLabel /}
+            </span>
+          </button>
+        {/if}
+        {if $showFiltersButton}
+          <button id="js-filters-open" type="button" class="Locator-button Locator-button--filtersOpen js-filters-open"
+                  aria-expanded="false"
+                  aria-controls="filters-wrapper"
+                  aria-haspopup="menu"
+                  data-ya-track="filters_open">
+            <span class="sr-only">
+              {call strings.filters_buttonLabel /}
+            </span>
+            {if $filtersSVG}
+              {$filtersSVG |noAutoescape}
+            {else}
+              {call components.Svg.Icon data="all"}
+                {param iconName: 'filters' /}
+              {/call}
+            {/if}
+            <span class="Locator-filtersCount js-filters-count"></span>
+          </button>
+        {/if}
+      </div>
+    {/param}
+  {/call}
+{/template}
+
+/**
+* @param baseUrl
+* @param content
+* @param? class
+* @param? filtersApplyText
+* @param? filtersClearText
+* @param? filtersCloseSVG
+* @param? filtersTitle
+*/
+{template .cobalt_filters}
+  <div class="LocatorFilters{if $class} {$class}{/if} js-filters-focus">
+    <div class="LocatorFilters-titleRow">
+      {if $filtersTitle}
+        {$filtersTitle |noAutoescape}
+      {else}
+        {call strings.filters_buttonText /}
+      {/if}
+      <button type="button" class="LocatorFilters-close js-filters-close"
+              aria-expanded="false"
+              aria-controls="filters-wrapper">
+        {if $filtersCloseSVG}
+          {$filtersCloseSVG |noAutoescape}
+        {else}
+          {call components.Svg.Icon data="all"}
+            {param iconName: 'close' /}
+          {/call}
+        {/if}
+        <span class="sr-only">
+          {call strings.filters_closeModal /}
+        </span>
+      </button>
+    </div>
+    <div class="LocatorFilters-content">
+      {$content |noAutoescape}
+    </div>
+    <div class="LocatorFilters-buttons">
+      <button type="button" class="LocatorFilters-button LocatorFilters-button--clear js-filters-clear" data-ya-track="filters_clear">
+        <span class="LocatorFilters-buttonContent">
+          {if $filtersClearText}
+            {$filtersClearText |noAutoescape}
+          {else}
+            {call strings.filters_clearAll /}
+          {/if}
+        </span>
+      </button>
+      <button id="js-form-submit" type="submit" class="LocatorFilters-button LocatorFilters-button--apply js-filters-apply" disabled
+              aria-expanded="false"
+              aria-controls="filters-wrapper"
+              data-ya-track="search">
+        <span class="LocatorFilters-buttonContent">
+          {if $filtersApplyText}
+            {$filtersApplyText |noAutoescape}
+          {else}
+            {call strings.filters_apply /}
+          {/if}
+        </span>
+      </button>
+    </div>
+  </div>
+{/template}
+
+/**
+ * @param prettyQuery
+ * @param resultCount
+ * @param? resultType
+ * @param? resultTypePlural
+ */
+{template .result_summary}
+  {let $searchQuery}
+    {if $prettyQuery}
+      <span class="ResultSummary-query">{$prettyQuery}</span>
+    {/if}
+  {/let}
+  {let $defaultResultType}
+    {call strings.locator_defaultResultType /}
+  {/let}
+  {let $resultTypeText: $resultType ? $resultType : $defaultResultType /}
+  {let $defaultResultTypePlural}
+    {call strings.locator_defaultResultTypePlural /}
+  {/let}
+  {let $resultTypePluralText: $resultTypePlural ? $resultTypePlural : $defaultResultTypePlural /}
+
+  <div class="ResultSummary">
+    {if $searchQuery}
+      {msg desc="X number of stores near a location-based query (ex a city name or a state)."}
+        {plural $resultCount}
+          {case 1}
+            1 {$resultTypeText} near "{$searchQuery |noAutoescape}"
+          {default}
+            {$resultCount} {$resultTypePluralText} near "{$searchQuery |noAutoescape}"
+        {/plural}
+      {/msg}
+    {else}
+      {msg desc="X number of stores"}
+        {plural $resultCount}
+          {case 1}
+            1 {$resultTypeText}
+          {default}
+            {$resultCount} {$resultTypePluralText}
+        {/plural}
+      {/msg}
+    {/if}
+  </div>
+{/template}
+
+/**
+ * @param baseUrl
+ * @param locale
+ *
+ * Locator params
+ * @param queryParams
+ * @param response
+ *
+ * Configuration params
+ * @param? noResultsContent
+ * @param? resultType
+ * @param? resultTypePlural
+ * @param? teaserModifier
+ * @param? unordered
+ */
+{template .cobalt_results}
+  {let $prettyQuery}
+    {call search.helpers.pretty_city_state_query data="all" /}
+  {/let}
+  {let $resultCount: length($response?.entities ?: []) /}
+
+  {if $resultCount > 0}
+    <div class="Locator-resultsSummary">
+      {call .result_summary data="all"}
+        {param prettyQuery: $prettyQuery /}
+        {param resultCount: $resultCount /}
+      {/call}
+    </div>
+    <div class="Locator-results">
+      <ol class="ResultList">
+        {foreach $entity in $response.entities}
+          <li class="ResultList-item{if not $unordered} ResultList-item--ordered{/if} js-location-result"
+            id="js-yl-{$entity.profile.meta.id}">
+            {call common.modules.Teaser data="$entity"}
+              {param baseUrl: $baseUrl /}
+              {param locale: $locale /}
+              {param modifier: $teaserModifier /}
+              {param callerTemplateName: 'cobalt.locator.cobalt_results' /}
+            {/call}
+          </li>
+        {/foreach}
+      </ol>
+    </div>
+  {else}
+    {let $browseDirectory}
+      <a href="{$baseUrl}{call url.root_page data="all" /}"
+         class="Locator-toDirectory"
+         data-ya-track="todirectory">
+        {call strings.locator_linkToDirectory /}
+      </a>
+    {/let}
+
+    <div class="Locator-noResults">
+      {if $noResultsContent}
+        {$noResultsContent |noAutoescape}
+      {else}
+        {call search.helpers.noResults data="all"}
+          {param prettyQuery: $prettyQuery /}
+          {param browseDirectory: $browseDirectory /}
+        {/call}
+      {/if}
+    </div>
+  {/if}
+{/template}
+
+/**
+ * @param prettyQuery
+ * @param browseDirectory
+ * @param? resultTypePlural
+ */
+{template .noResults}
+  {let $defaultResultTypePlural}
+    {call strings.locator_defaultResultTypePlural /}
+  {/let}
+  {let $resultTypePluralText: $resultTypePlural ? $resultTypePlural : $defaultResultTypePlural /}
+  {let $searchQuery}
+    <span class="Locator-noResultsQuery">{$prettyQuery}</span>
+  {/let}
+
+  {msg desc=""}
+    Sorry, there are no {$resultTypePluralText} near "{$searchQuery |noAutoescape}" satisfying the selected filters. Please modify your search and try again or {$browseDirectory |noAutoescape}
+  {/msg}
+{/template}

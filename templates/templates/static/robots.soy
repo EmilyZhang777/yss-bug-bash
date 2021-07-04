@@ -1,0 +1,10 @@
+{namespace static}
+
+/**
+ * @param isHttps
+ * @param siteDomain
+ */
+{template .robotstxt}
+  User-agent: *
+  {\n}Sitemap: http{if $isHttps}s{/if}://{$siteDomain}/{call url.xmlSitemap /}
+{/template}
